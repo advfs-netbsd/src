@@ -94,7 +94,7 @@ static inline void NFS_FREEZE_UNLOCK(struct vnode *vp)
         mutex_enter( &dmnP->dmnFreezeMutex );
         dmnP->dmnFreezeRefCnt--;
         if ( dmnP->dmnFreezeWaiting && dmnP->dmnFreezeRefCnt == 0) {
-            thread_wakeup( (vm_offset_t)&dmnP->dmnFreezeWaiting );
+            thread_wakeup( (vsize_t)&dmnP->dmnFreezeWaiting );
         }
         mutex_exit( &dmnP->dmnFreezeMutex );
     }
@@ -142,7 +142,7 @@ int msfs_lookup(),
     msfs_strategy(),
     msfs_print(struct vnode *vp),
     msfs_page_read(struct vnode *vp, struct uio *uio, struct uucred *cred),
-    msfs_page_write(struct vnode *vp, struct uio *uio, struct uucred *cred, memory_object_t pager, vm_offset_t offset),
+    msfs_page_write(struct vnode *vp, struct uio *uio, struct uucred *cred, memory_object_t pager, vsize_t offset),
     msfs_refer(),
     msfs_release(),
     msfs_getpage(),     /* get page */
@@ -154,7 +154,7 @@ int msfs_lookup(),
     msfs_lockctl(struct vnode *vp, struct eflock *eld, int flag, struct uucred *cred, pid_t clid, off_t offset),
     /* file locking */
     msfs_setvlocks(struct vnode *vp),
-    msfs_syncdata(struct vnode *vp, int fflags, vm_offset_t start, vm_size_t length, struct uucred *cred),
+    msfs_syncdata(struct vnode *vp, int fflags, vsize_t start, vsize_t length, struct uucred *cred),
     /* fsync byte range */
     msfs_pathconf(),    /* pathconf */
     msfs_objtovp(),
@@ -426,7 +426,7 @@ decr_link_count(
  *
  * zero out a frag's contents.  Analogous to bcopy_frag in fs_read_write.c
  */
-static statusT
+static int
 bzero_frag(
     struct bfAccess *bfap,
     uint32T start,
@@ -462,7 +462,7 @@ msfs_create(
             struct vattr *vap       /* in - vnode attributes for create */
             )
 {
-    statusT ret;
+    int ret;
 
     FILESETSTAT( ndp->ni_dvp, msfs_create );
 
@@ -796,7 +796,7 @@ msfs_getattr(
     struct mount *mp;
     struct timeval new_time;
     uint32T pageCnt;
-    statusT sts;
+    int sts;
     struct fileSetNode *fsn;
 
 
@@ -990,7 +990,7 @@ msfs_setattr(
              register struct uucred *cred   /* in - callers credentials */
              )
 {
-    statusT sts=0;
+    int sts=0;
 
 
     NFS_FREEZE_LOCK(vp);
@@ -1009,7 +1009,7 @@ fs_setattr(
              register struct uucred *cred)   /* in - callers credentials */
 {
     int error = 0;
-    statusT sts;
+    int sts;
     bfAccessT *bfap;
     struct fsContext *context_ptr;
     uid_t iuid;
@@ -1276,7 +1276,7 @@ fs_setattr_truncate( bfAccessT *bfap,
     extern u_int noadd_execaccess;
     int remove_exec_perm = 0;
     actRangeT *arp;
-    statusT sts;
+    int sts;
 
     error = chk_quota_write( cp );
     if ( error != 0 ) {
@@ -1594,10 +1594,10 @@ notrunc:
  *
  * Zero the contents of a frag.
  */
-static statusT
+static int
 bzero_frag(struct bfAccess *bfap, uint32T start, ftxHT ftxH)
 {
-    statusT sts = EOK;
+    int sts = EOK;
     uint32T fragPgOffset = FRAG2PG(bfap->fragId.frag);
     uint32T fpOffset, fpCount, fragSize, zOffset;
     bfPageRefHT pgRef;
@@ -1943,7 +1943,7 @@ msfs_fsync(
            int waitfor          /* in - wait flag */
            )
 {
-    statusT sts=0;
+    int sts=0;
 
     FILESETSTAT( vp, msfs_fsync );
 
@@ -1962,7 +1962,7 @@ fs_fsync(
            )
 {
     struct mount *mp;
-    statusT saved_dkResult, ret;
+    int saved_dkResult, ret;
     struct fsContext *file_context;
     bfAccessT *bfap;
     domainT *dmnP;
@@ -2078,7 +2078,7 @@ msfs_remove(
             struct nameidata *ndp  /* in - nameidata structure pointer */
             )
 {
-    statusT sts;
+    int sts;
     struct bfNode *bnp, *dir_bnp, *undel_bnp;
     struct vnode *dvp = NULL, *undel_dir_vp = NULL, *rvp = NULL;
     struct fsContext *rem_context, *dir_context, *undel_context;
@@ -2577,7 +2577,7 @@ msfs_link(
     struct fsContext *file_context, *dir_context;
     struct bfNode *bnp, *dbnp;
     struct vnode *dvp = NULL;
-    statusT ret;
+    int ret;
     struct mount *mp;
     bfSetT *bfSetp;
     domainT *dmnP;
@@ -2839,7 +2839,7 @@ msfs_rename(
     struct mount *mp, *from_mp;
     ftxHT ftx_handle;
     domainT *dmnP;
-    statusT ret, sts;
+    int ret, sts;
     int stripslash = 0;
     int error;
     fs_dir_entry *dir_buffer;
@@ -3858,7 +3858,7 @@ msfs_mkdir(
            struct vattr *vap       /* in - vnode attributes structure */
            )
 {
-    statusT ret;
+    int ret;
 
     FILESETSTAT( ndp->ni_dvp, msfs_mkdir );
 
@@ -3885,7 +3885,7 @@ msfs_rmdir(
     bfAccessT *idx_bfap = NULL;
     struct fsContext *rem_context, *par_context;
     struct bfNode *bnp;
-    statusT ret, dirempty_ret;
+    int ret, dirempty_ret;
     ftxHT ftx_handle;
     bfSetT *bfSetp;
     struct mount *mp;
@@ -4205,7 +4205,7 @@ msfs_symlink(
              char *target
              )
 {
-    statusT ret;
+    int ret;
 
     FILESETSTAT( ndp->ni_dvp, msfs_symlink );
 
@@ -4274,7 +4274,7 @@ msfs_readlink(
     ulong isize;
     int error;
     char *buffer = NULL;
-    statusT sts;
+    int sts;
 
     FILESETSTAT( vp, msfs_readlink );
 
@@ -4690,7 +4690,7 @@ msfs_page_read(
      * if reading less than there actually is, the zero the page
      */
     if (phys && readable_bytes < size) {
-        pmap_zero_page((vm_offset_t)uio->uio_iov->iov_base);
+        pmap_zero_page((vsize_t)uio->uio_iov->iov_base);
     }
 
     do {
@@ -4698,7 +4698,7 @@ msfs_page_read(
         int starting_byte;   /* starting byte within the page to read */
         int bytes_to_read;   /* # bytes within the page to read */
         bfPageRefHT page_ref;
-        statusT ret;
+        int ret;
         char *page_addr;
 
         /* the page # to read */
@@ -4795,7 +4795,7 @@ msfs_page_write(
                 struct uio *uio,       /* in - uio structure pointer */
                 struct uucred *cred,    /* in - callers credentials */
                 memory_object_t pager, /* in - not used */
-                vm_offset_t offset     /* in - not used */
+                vsize_t offset     /* in - not used */
                 )
 {
     int error;
@@ -4875,7 +4875,7 @@ msfsspec_close(
     struct uucred *cred)
 {
     struct fsContext *cp;
-    statusT ret;
+    int ret;
 
 
     NFS_FREEZE_LOCK(vp);
@@ -5082,7 +5082,7 @@ msfsfifo_close(
     )
 {
     struct fsContext *cp;
-    statusT ret;
+    int ret;
 
 
     NFS_FREEZE_LOCK(vp);
@@ -5277,13 +5277,13 @@ msfs_chmod(
 /*
  * attach an undelete directory to a directory
  */
-statusT
+int
 attach_undel_dir(
                  char *dir_path,
                  char *undel_dir_path
                  )
 {
-    statusT sts, ret;
+    int sts, ret;
     register struct nameidata *ndp = &u.u_nd;
     struct nameidata *undel_ndp = NULL;
     struct utask_nd undel_utnd;
@@ -5452,13 +5452,13 @@ _exit1:
 /*
  * detach an undelete directory from a directory
  */
-statusT
+int
 detach_undel_dir(
                  char *dir_path,
                  long xid
                  )
 {
-    statusT sts;
+    int sts;
     int error;
     register struct nameidata *ndp = &u.u_nd;
     register struct vnode *dir_vp = NULL;
@@ -5548,7 +5548,7 @@ HANDLE_EXCEPTION:
 /*
  * get a directory's undelete dir tag
  */
-statusT
+int
 get_undel_dir(
               char *dir_path,
               bfTagT *undelDirTag
@@ -5620,7 +5620,7 @@ get_undel_dir(
  * anything else funny happens (can't find the dir entry or whatever)
  * returns ENO_NAME.
  */
-statusT
+int
 get_name(
          struct mount *mp,   /* in - mount structure pointer */
          bfTagT bf_tag,      /* in - tag of file */
@@ -5629,7 +5629,7 @@ get_name(
          bfTagT *parent_tag  /* out - tag of parent diirectory */
          )
 {
-    statusT sts, return_status;
+    int sts, return_status;
     int i;
     int last_page;
     bfAccessT *bfap=NULL, *dir_bfap=NULL;
@@ -5715,7 +5715,7 @@ get_name(
      */
     dir_contextp = VTOC( dir_bfap->bfVp );
     if ( !dir_contextp ) {
-        statusT sts = EOK;
+        int sts = EOK;
 
         /* bs_access() can return an access structure with a vnode that
          * has just been allocated.  If this is the case, the vnode still
@@ -5790,7 +5790,7 @@ HANDLE_EXCEPTION:
 }
 
 
-statusT
+int
 get_name2(
          char *name,         /* in - name of file/dir in same fileset */
          bfTagT bf_tag,      /* in - tag of file */
@@ -5799,7 +5799,7 @@ get_name2(
          bfTagT *parent_tag  /* out - tag of parent diirectory */
          )
 {
-    statusT sts;
+    int sts;
     int error;
     register struct nameidata *ndp = &u.u_nd;
     register struct vnode *dir_vp = NULL;
@@ -5964,12 +5964,12 @@ msfs_setvlocks(
 msfs_syncdata(
               struct vnode *vp,    /* in - vnode to fsync */
               int fflags,          /* in - flags */
-              vm_offset_t start,   /* in - starting offset to sync in file */
-              vm_size_t length,    /* in - length to sync */
+              vsize_t start,   /* in - starting offset to sync in file */
+              vsize_t length,    /* in - length to sync */
               struct uucred *cred   /* in - credentials of caller */
               )
 {
-    statusT ret;
+    int ret;
     struct fsContext *file_context;
     bfAccessT *bfap = VTOA(vp);
     bsPageT first_page_to_flush,

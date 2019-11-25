@@ -340,7 +340,7 @@ _domain_panic(domainT *dmnP, char *msg, int flags)
 }
 
 #ifdef ADVFS_DEBUG
-statusT
+int
 bs_diskerror(
     domainT *dmnP,
     int vd,
@@ -406,7 +406,7 @@ bs_osf_complete(
     ioDescT *next;
     ioDescT *first_iop, *last_iop;
     struct vd *vdp;
-    statusT sts = EOK;
+    int sts = EOK;
     int pages = 0;
     int len;
     int i;
@@ -418,7 +418,7 @@ bs_osf_complete(
     domainT *dmnP;
     int resetfirst = 0;
     extern void resetfirstrec( domainT* dmnP );
-    void bp_map_free( vm_offset_t, int ); 
+    void bp_map_free( vsize_t, int ); 
     int dpanic_flags=0;
     int hardware_related_error = FALSE;
     int error_maybe_retriable = FALSE;
@@ -439,7 +439,7 @@ bs_osf_complete(
      * Set up the I/O result field
      */
     if( (bp->b_flags & B_ERROR) == 0 ) {
-        sts = (statusT)EOK;
+        sts = (int)EOK;
     } else {
         /*
          * Retry I/O that returns any of the following b_eei errors
@@ -605,9 +605,9 @@ bs_osf_complete(
         }
 
         if( bp->b_error ) {
-            sts = (statusT)bp->b_error;
+            sts = (int)bp->b_error;
         } else {
-            sts = (statusT)EIO;
+            sts = (int)EIO;
         }
     }
 
@@ -935,11 +935,11 @@ bs_osf_complete(
     freeosfbuf( bp );
 
     if( pages ) {
-        pmap_mmu_unload( (vm_offset_t)taddr, 
-                         (vm_size_t)pages << PAGE_SHIFT, 
+        pmap_mmu_unload( (vsize_t)taddr, 
+                         (vsize_t)pages << PAGE_SHIFT, 
                          TB_SYNC_ALL );
         /* Return any allocated virtual memory */
-        bp_map_free( (vm_offset_t)taddr, pages ); 
+        bp_map_free( (vsize_t)taddr, pages ); 
     }
 }
 
@@ -1057,11 +1057,11 @@ msfs_io_init(void)
 
 int
 list_map( ioDescT *ioList, 
-          vm_offset_t starting_virtual_address )
+          vsize_t starting_virtual_address )
 {
     ioDescT *iop = ioList;
     u_char *virtual_addr;
-    vm_offset_t phys;
+    vsize_t phys;
     int len = ioList->desCnt;
     int ret;
 
@@ -1077,9 +1077,9 @@ list_map( ioDescT *ioList,
          * the bsbuf->vmpage pointer in prep for I/O.
          */
         phys = page_to_phys( iop->bsBuf->vmpage );
-        ret = pmap_mmu_load( (vm_offset_t)virtual_addr,
+        ret = pmap_mmu_load( (vsize_t)virtual_addr,
                              phys, 
-                             (vm_size_t)PAGE_SIZE,
+                             (vsize_t)PAGE_SIZE,
                              VM_PROT_READ|VM_PROT_WRITE, 
                              TB_SYNC_NONE );
         if( ret != KERN_SUCCESS ) {
@@ -1138,9 +1138,9 @@ consecutive_list_io(
     lbnT blkcnt;
     int maxio;
     int pages;
-    vm_offset_t virtual_mem_start;
-    vm_offset_t bp_map_alloc( int, boolean_t );
-    void        bp_map_free( vm_offset_t, int );
+    vsize_t virtual_mem_start;
+    vsize_t bp_map_alloc( int, boolean_t );
+    void        bp_map_free( vsize_t, int );
     int         map_status = -1;
 
     KASSERT(max_buffers > 1);

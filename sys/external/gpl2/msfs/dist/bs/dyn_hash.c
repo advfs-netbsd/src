@@ -510,7 +510,7 @@ void
 dyn_init_hashthread()
 {
     extern proc_t *Advfsd;
-    statusT sts;
+    int sts;
     tid_t tid;
 
     sts = msgq_create( &dyn_hashthread_msgQH,       /* returned handle to queue */

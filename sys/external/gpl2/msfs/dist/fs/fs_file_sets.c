@@ -69,7 +69,7 @@
  * Creates a file set.
  */
 
-statusT
+int
 fs_fset_create(
     char *domain,               /* in - set's domain table */
     char *setName,              /* in - set's name */
@@ -82,7 +82,7 @@ fs_fset_create(
     long xid2                   /* in - CFS transaction id */
     )
 {
-    statusT sts;
+    int sts;
     int fileSetCreated = FALSE, ftxStarted = FALSE;
     int dmnActive = FALSE, dmnOpen = FALSE, bfsOpen = FALSE;
     bfDomainIdT domainId;
@@ -279,7 +279,7 @@ _error:
  * Return a file set's id.
  */
 
-statusT
+int
 fs_fset_get_id(
     char *domain,          /* in - name of set's domain table */
     char *setName,         /* in - name of set */
@@ -288,7 +288,7 @@ fs_fset_get_id(
 {
     bfSetT *bfSetp;
     
-    statusT sts;
+    int sts;
     int dmnActive = FALSE, setOpen = FALSE;
     bfDmnParamsT *dmnParamsp = NULL;
     bfSetParamsT *setParamsp = NULL;
@@ -387,14 +387,14 @@ _error:
  * Return a file set's stats.
  */
 
-statusT
+int
 fs_fset_get_stats(
     char *domain,               /* in - name of set's domain */
     char *setName,              /* in - name of set */
     fileSetStatsT *fSetStats    /* out - set's stats */
     )
 {
-    statusT sts;
+    int sts;
     int dmnActive = FALSE, setOpen = FALSE;
     bfSetT *bfSetp, *temp;
     struct fileSetNode *fsnp;
@@ -495,7 +495,7 @@ _error:
  * Delete's a file set.
  */
 
-statusT
+int
 fs_fset_delete(
     char *domain,       /* in - name of set's domain table */
     char *setName,      /* in - name of set to delete */
@@ -504,7 +504,7 @@ fs_fset_delete(
 {
     bfSetIdT bfSetId;
     bfSetT *bfSetp;
-    statusT sts;
+    int sts;
     int dmnActive = FALSE, setOpen = FALSE;
     bfDmnParamsT *dmnParamsp = NULL;
     bfSetParamsT *setParamsp = NULL;
@@ -608,7 +608,7 @@ _error:
  * Creates a clone file set of an 'original' file set.
  */
 
-statusT
+int
 fs_fset_clone(
     char *domain,                 /* in - name of set's domain */
     char *origSetName,            /* in - name of orig set */
@@ -617,7 +617,7 @@ fs_fset_clone(
     long xid                      /* in - CFS transaction id */
     )
 {
-    statusT sts;
+    int sts;
     int origDmnActive = FALSE, origSetOpen = FALSE, origMounted = FALSE;
     bfSetIdT origBfSetId;
     bfSetT *origBfSetp;
@@ -743,7 +743,7 @@ HANDLE_EXCEPTION:
  * Used to get info of all sets in a domain.  See bs_bfs_get_info().
  */
 
-statusT
+int
 fs_fset_get_info(
     char *domain,              /* in - domain table */
     uint32T *nextSetIdx,       /* in/out - index of set */
@@ -755,7 +755,7 @@ fs_fset_get_info(
     bfDomainIdT domainId;
     domainT *dmnP;
     bfDmnParamsT *dmnParamsp = NULL;
-    statusT sts, retSts;
+    int sts, retSts;
     int dmnActive = FALSE, dmnOpen = FALSE;
     u_long fmflg = flag ? M_FMOUNT : 0;
 
@@ -833,7 +833,7 @@ _error:
  * Used to change a file set's name.
  */
 
-statusT
+int
 fs_fset_name_change(
     char *domain,       /* in - domain table file name */
     char *origsetName,  /* in - set's name */
@@ -843,7 +843,7 @@ fs_fset_name_change(
 {
     bfSetIdT bfSetId;
     bfSetT *bfSetp;
-    statusT sts;
+    int sts;
     int dmnActive = FALSE, setAccess = FALSE;
     int tblLocked = FALSE;
     bfSetParamsT *setParamsp = NULL;
@@ -986,7 +986,7 @@ HANDLE_EXCEPTION:
  * The "trunc" flag is set in the access structure if a frag was created.
  */
 
-statusT
+int
 fs_create_frag (
                 bfSetT *bfSetp,  /* in */
                 bfAccessT* bfap,  /* in */
@@ -1004,7 +1004,7 @@ fs_create_frag (
     uint32T lastPageOffset;
     struct mount *mountPoint;
     bfPageRefHT pgRef;
-    statusT sts;
+    int sts;
     uint32T subFrag1ByteCnt;
     uint32T subFrag1ByteOffset;
     char *subFrag1Page;
@@ -1031,13 +1031,13 @@ fs_create_frag (
             /*
              * Quota file.  Don't frag it.
              */
-            return (statusT)1;
+            return (int)1;
         }
     }
 
     if ((fileSetNode->fsFlags & FS_CLONEFSET) ||
             (mountPoint->m_flag & M_RDONLY)) {
-        return (statusT)1;
+        return (int)1;
     }
 
     /*
@@ -1054,7 +1054,7 @@ fs_create_frag (
          * the last page if it is not fragged is less than the frag percent.
          * Don't frag the last page.
          */
-        return (statusT)1;
+        return (int)1;
     }
 
     /*
@@ -1178,7 +1178,7 @@ HANDLE_EXCEPTION:
         bs_derefpg(pgRef, BS_CACHE_IT);
     }
     
-    return (statusT)1;
+    return (int)1;
 
 }  /* end fs_create_frag */
 
@@ -1280,7 +1280,7 @@ fs_quick_frag_test (
  * FIX - clean up error paths.
  */
 
-statusT
+int
 fs_delete_frag (
     bfSetT *bfSetp,  /* in */
     bfAccessT *bfap,    /* in */
@@ -1291,8 +1291,8 @@ fs_delete_frag (
     )
 {
     struct fsContext *fileContext;
-    statusT sts;
-    statusT sts2;
+    int sts;
+    int sts2;
 
 
     if (bfSetp->cloneId != BS_BFSET_ORIG) {

@@ -203,8 +203,8 @@ typedef struct bfAccess {
      * Following fields are protected by bfIoLock
      */
     kmutex_t bfIoLock;            /* lock for I/O related fields in this struct */
-    statusT dkResult;           /* Disk error field - used in flush */
-    statusT miDkResult;         /* Disk error field - used in migrate flush */
+    int dkResult;           /* Disk error field - used in flush */
+    int miDkResult;         /* Disk error field - used in migrate flush */
     struct bsBufHdr dirtyBufList; /* List of modified buffers. */
     uint16T flushWait;          /* Number of threads waiting for an lsn */
     uint16T maxFlushWaiters;    /* Maximum flush waiter threads counter */
@@ -355,7 +355,7 @@ struct bfAccessHdr {
 #define BS_FAILOVER    4
 #define BS_ON_DDL      8
 
-statusT
+int
 bs_map_bf(
           bfAccessT* bfAp,         /* in/out - ptr to bitfile's access struct */
           uint32T options,         /* in - options flags (see ) */
@@ -369,7 +369,7 @@ bs_have_clone(
               ftxHT ftxH               /* in - ftx handle */
               );
 
-statusT
+int
 new_clone_mcell(
                 bfMCIdT* bfMCIdp,        /* out - ptr to mcell id */
                 domainT* dmnp,           /* in - domain ptr */
@@ -391,7 +391,7 @@ new_clone_mcell(
 
 #define NULLMT NULL
 
-statusT
+int
 bs_access_one(
               bfAccessT **bfap,    /* out - access structure pointer */
               bfTagT tag,          /* in - tag of bf to access */
@@ -412,7 +412,7 @@ bs_access_one(
 #define MSFS_DO_VRELE      0x4
 #define MSFS_SS_NOCALL     0x8 /* force vfast to not update vfast lists */
 
-statusT
+int
 bs_close_one(
              bfAccessT *bfap,     /* in */
              int options,         /* in */
@@ -438,7 +438,7 @@ bs_invalidate_rsvd_access_struct (
                                   bfAccessT *bfap       /* in */
                                   );
 
-statusT
+int
 bs_reclaim_cfs_rsvd_vn (
                         bfAccessT *bfap       /* in */
                         );
@@ -451,7 +451,7 @@ free_acc_struct(
 extern struct bfAccessHdr FreeAcc;
 extern struct bfAccessHdr ClosedAcc;
 
-statusT
+int
 bmtr_get_rec_ptr(
     bfAccessT *bfap,            /* in - bf access struct ptr */
     ftxHT parentFtxH,           /* in - transaction handle */
@@ -471,7 +471,7 @@ void insert_actRange_onto_list( bfAccessT *bfap,
 void remove_actRange_from_list( bfAccessT *bfap,
                                 actRangeT *arp  );
 
-statusT
+int
 limits_of_active_range(
     bfAccessT *bfap,
     bsPageT pg,

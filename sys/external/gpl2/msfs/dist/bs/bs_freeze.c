@@ -162,7 +162,7 @@ bs_freeze_thread( void )
     while (TRUE) {
         mutex_enter(&AdvfsFreezeMsgsLock);
         if (!AdvfsFreezeMsgs) {
-            assert_wait_mesg( (vm_offset_t) &AdvfsFreezeMsgs, FALSE, "advfs_freeze_thread" );
+            assert_wait_mesg( (vsize_t) &AdvfsFreezeMsgs, FALSE, "advfs_freeze_thread" );
             if (freezeInfoP = AdvfsFrozenList) {
                 TIME_READ (curTime);
                 thread_set_timeout(hz * (freezeInfoP->frziTimeout - curTime.tv_sec) );
@@ -266,7 +266,7 @@ check_for_new_msg( void )
         } else {
             msg->frzmStatus = EOK;
         }
-        thread_wakeup( (vm_offset_t) &msg->frzmStatus );
+        thread_wakeup( (vsize_t) &msg->frzmStatus );
     }
 }
 
@@ -284,7 +284,7 @@ void
 freeze_domain( advfsFreezeMsgT *msg )
 {
 
-    statusT            sts;
+    int            sts;
     struct timeval     tv;
     domainT           *dmnP            = NULL;
     advfsFreezeInfoT  *freezeInfoP     = NULL;
@@ -313,7 +313,7 @@ freeze_domain( advfsFreezeMsgT *msg )
     mutex_enter(&dmnP->dmnFreezeMutex);
     if (dmnP->dmnFreezeRefCnt) {
         dmnP->dmnFreezeWaiting++;
-        assert_wait_mesg( (vm_offset_t)&dmnP->dmnFreezeWaiting,
+        assert_wait_mesg( (vsize_t)&dmnP->dmnFreezeWaiting,
                            FALSE,
                            "bs_freeze" );
         mutex_exit(&dmnP->dmnFreezeMutex);
@@ -334,7 +334,7 @@ freeze_domain( advfsFreezeMsgT *msg )
         FILESET_UNLOCK(&FilesetLock );
         msg->frzmStatus = ENOENT;
         ms_free (freezeInfoP);
-        thread_wakeup( (vm_offset_t) &msg->frzmStatus );
+        thread_wakeup( (vsize_t) &msg->frzmStatus );
         return;
     }
     FILESET_UNLOCK(&FilesetLock );
@@ -387,7 +387,7 @@ freeze_domain( advfsFreezeMsgT *msg )
         mutex_exit(&dmnP->dmnFreezeMutex);
         ms_free (freezeInfoP);
         msg->frzmStatus = EIO;
-        thread_wakeup( (vm_offset_t) &msg->frzmStatus );
+        thread_wakeup( (vsize_t) &msg->frzmStatus );
         return;
     }
 
@@ -441,7 +441,7 @@ freeze_domain( advfsFreezeMsgT *msg )
      *  Set status and wakeup the originating thread
      */
     msg->frzmStatus = EOK;
-    thread_wakeup( (vm_offset_t) &msg->frzmStatus );
+    thread_wakeup( (vsize_t) &msg->frzmStatus );
 
     return;
 }
@@ -459,7 +459,7 @@ static
 void
 thaw_domain( advfsFreezeInfoT *freezeInfoP, int forced )
 {
-    statusT            sts;
+    int            sts;
     struct timeval     tv;
     domainT           *dmnP          = NULL;
     bsDmnFreezeAttrT   dmnFreezeAttr;

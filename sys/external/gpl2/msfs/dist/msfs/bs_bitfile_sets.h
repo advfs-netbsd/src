@@ -377,7 +377,7 @@ bfset_trace( bfSetT  *bfsetp,
         mutex_exit(&bfSetp->accessChainLock); \
 }
 
-statusT
+int
 rbf_bfs_create( 
     struct domain *dmnP,    /* in - domain handle */
     serviceClassT reqServ,  /* in - required service class */
@@ -388,7 +388,7 @@ rbf_bfs_create(
     bfSetIdT *bfSetId       /* out - bitfile set id */
     );
 
-statusT
+int
 rbf_bfs_access( 
     bfSetT **retBfSetp,    /* out - pointer to open bitfile-set */
     bfSetIdT bfSetId,      /* in - bitfile-set id */
@@ -403,7 +403,7 @@ rbf_bfs_access(
 #define BFS_OP_IGNORE_DEL 1
 #define BFS_OP_XFER_XTNTS_TO_CLONE 2
 
-statusT
+int
 rbf_bfs_open( 
     bfSetT **retBfSetp,    /* out - pointer to open bitfile-set */
     bfSetIdT bfSetId,      /* in - bitfile-set id */
@@ -418,7 +418,7 @@ bs_bfs_close(
     uint32T options       /* in - options flags */
     );
 
-statusT
+int
 bs_bfs_delete(
     bfSetIdT bfSetId,		/* in - bitfile set id */
     struct domain *dmnP,	/* in - set's domain pointer */
@@ -426,7 +426,7 @@ bs_bfs_delete(
     u_long flag                 /* in - to indicate cluster_root failover */
     );
 
-statusT
+int
 bs_bfs_clone(
     bfSetIdT origSetId,         /* in - activated orig set's id */
     char *setName,              /* in - set's name */
@@ -440,7 +440,7 @@ bs_bfs_init(
     void
     );
 
-statusT
+int
 bs_bfs_add_root( 
     bfSetIdT rootBfSetId,  /* in - bitfile-set id */
     struct domain *dmnP,   /* in - BF-set's domain's pointer */
@@ -469,17 +469,17 @@ bs_bfs_lookup_desc(
  * also see bs_public.h for more routines (public bitfile set routines).
  */
 
-statusT
+int
 bs_fragbf_open(
     bfSetT *bfSetp
     );
 
-statusT
+int
 bs_fragbf_close(
     bfSetT *bfSetp
     );
 
-statusT
+int
 bs_frag_alloc(
     bfSetT *setp,       /* in */
     bfFragT fragType,   /* in */

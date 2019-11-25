@@ -71,21 +71,21 @@ sc_init_sc_tbl(
                void
                );
 
-statusT
+int
 sc_add_vd( 
           struct domain *dmnp,          /* in - ptr to domain with sc table */
           serviceClassT vdSvc,          /* in - vd's svc class */
           uint16T vdIndex               /* in - vd's index */
           );
 
-statusT
+int
 sc_remove_vd(
              struct domain *dmnp,       /* in - ptr to domain with sc table */
              serviceClassT vdSvc,       /* in - vd's svc class */
              uint16T vdIndex            /* in - vd's index */
              );
 
-statusT
+int
 sc_valid_vd(
     struct domain *dmnp,       /* in - ptr to domain with sc table */
     serviceClassT reqServices, /* in - required services */
@@ -93,7 +93,7 @@ sc_valid_vd(
     uint16T vdIndex            /* in - vd's index */
     );
 
-statusT
+int
 sc_select_vd_for_mcell(
     struct vd **vdpa,          /* out - selected volume */
     struct domain *dmnP,       /* in - domain handle */
@@ -102,7 +102,7 @@ sc_select_vd_for_mcell(
     serviceClassT optServices  /* in - optional service class */
     );
 
-statusT
+int
 sc_select_vd_for_stg(
     struct vd **vdpa,          /* out - selected volume */
     struct domain *dmnP,       /* in - domain handle */

@@ -77,7 +77,7 @@ bmtr_max_rec_size( void );
 #define bmtr_get_rec( bfap, rt, bp, bs ) \
     bmtr_get_rec_n_lk( bfap, rt, bp, bs, BMTR_NO_LOCK )
 
-statusT
+int
 bmtr_get_rec_n_lk(
     struct bfAccess *bfap,      /* in - bf access structure */
     u_short rType,              /* in - type of record */
@@ -92,7 +92,7 @@ bmtr_get_rec_n_lk(
 #define bmtr_put_rec_xid( bfap, rt, bp, bs, ftxh, xid) \
     bmtr_put_rec_n_unlk( bfap, rt, bp, bs, ftxh, BMTR_NO_LOCK, xid )
 
-statusT
+int
 bmtr_put_rec_n_unlk(
     struct bfAccess *bfap,      /* in - bf access structure */
     u_short rType,              /* in - type of record */
@@ -103,7 +103,7 @@ bmtr_put_rec_n_unlk(
     long xid                    /* in - CFS transaction id */
     );
 
-statusT
+int
 bmtr_put_rec_n_unlk_int(
     struct bfAccess *bfap,      /* in - bf access structure */
     u_short rType,              /* in - type of record */

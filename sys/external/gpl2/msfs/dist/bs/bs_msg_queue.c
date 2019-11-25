@@ -139,7 +139,7 @@ ulmq_destroy_freelist( msgQT *msgQ );
  * returns EBAD_PARAMS, ENO_MORE_MEMORY or EOK.
  */
 
-statusT
+int
 msgq_create(
     msgQHT *msgQH,      /* out - message queue handle */
     int maxMsgs,        /* in -  initial message buffers to allocate for queue */

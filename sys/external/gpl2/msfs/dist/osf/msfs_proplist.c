@@ -148,7 +148,7 @@ typedef struct delPropRootDone {
 /*
  * CUR - routines to manipulate record cursor 
  */
-static statusT
+static int
 msfs_pl_init_cur(
 		 bsRecCurT *cur,                /* out    */
 		 vdIndexT  VD,                  /* in     */
@@ -158,27 +158,27 @@ static void*
 msfs_pl_cur_to_pnt(
 		   domainT *domain,             /* in     */
 		   bsRecCurT *cur,              /* in/out */
-                   statusT *ret                 /* out */
+                   int *ret                 /* out */
 		   );
 
 static void
 msfs_pl_deref_cur(
 		  bsRecCurT *cur                /* in/out */
 		  );
-static statusT
+static int
 msfs_pl_pin_cur(
 		domainT *domain,                /* in     */
 		bsRecCurT *cur,                 /* in/out */
 		int size,                       /* in     */
 		ftxHT ftx                       /* in     */
 		);
-static statusT
+static int
 msfs_pl_seek_cur(
 		 domainT *domain,               /* in     */
 		 bsRecCurT *cur,                /* in/out */
 		 const int rtype                /* in     */ 
 		 );
-static statusT 
+static int 
 msfs_pl_next_mc_cur(
 		    domainT *domain,            /* in     */
 		    bsRecCurT *cur              /* in/out */
@@ -213,7 +213,7 @@ msfs_pl_fill_hdr_image(
 		       uint32T pl_num
 		       );
 
-static statusT
+static int
 msfs_pl_create_rec(
 		   bfAccessT *bfAccess,          /* in     */
 		   bsRecCurT *cur,               /* in/out */
@@ -285,7 +285,7 @@ msfs_pl_get_entry(
 		  proplist_sec_attrs_t *sec_info /* out   */
 		  );
 
-static statusT 
+static int 
 msfs_pl_get_name(
 		 domainT *domain,               /* in     */
 		 bsRecCurT *hdr,                /* in/out */
@@ -351,7 +351,7 @@ msfs_pl_del_data_chain(
 		       bsOdRecCurT *end,        /* in     */
 		       ftxHT ftx                /* in     */
 		       );
-static statusT
+static int
 msfs_pl_unlink_mcells(
 		      domainT *domain,          /* in     */
 		      vdIndexT prevVdIndex,     /* in     */
@@ -428,7 +428,7 @@ msfs_pl_get_entry_v3(
 		  struct vnode *vp,		/* in     */
 		  proplist_sec_attrs_t *sec_info /* out   */
 		  );
-static statusT 
+static int 
 msfs_pl_get_name_v3(
 		 domainT *domain,               /* in     */
 		 bsRecCurT *hdr,                /* in/out */
@@ -555,7 +555,7 @@ msfs_pl_get_locks(
 void
 msfs_pl_register_agents()
 {
-  statusT sts;
+  int sts;
 
   sts = ftx_register_agent_n2(
 			      FTA_MSFS_SETPROPLIST,
@@ -621,7 +621,7 @@ msfs_pl_rec_validate(struct bfAccess* bfap,        /* in - access ptr */
  * INIT_CUR - initialize record cursor at first record in specified cell
  */
 
-static statusT
+static int
 msfs_pl_init_cur(
 		 bsRecCurT *cur,                /* out    */
 		 vdIndexT  VD,                  /* in     */
@@ -652,10 +652,10 @@ static void*
 msfs_pl_cur_to_pnt(
 		   domainT *domain,             /* in     */
 		   bsRecCurT *cur,              /* in/out */
-                   statusT *ret                 /* out */
+                   int *ret                 /* out */
 		   )
 {
-  statusT sts = EOK;
+  int sts = EOK;
 
   if (cur->bmtp == NULL) {
     sts = bmt_refpg(
@@ -697,7 +697,7 @@ msfs_pl_deref_cur(
  * PIN_CUR - pin record and surrounding mcell record headers
  */
 
-statusT
+int
 msfs_pl_pin_cur(
 		domainT *domain,                /* in     */
 		bsRecCurT *cur,                 /* in/out */
@@ -705,7 +705,7 @@ msfs_pl_pin_cur(
 		ftxHT ftx                       /* in     */
 		)
 {
-  statusT sts = EOK;
+  int sts = EOK;
 
   if (!cur->is_pined) {
     sts = rbf_pinpg(
@@ -735,7 +735,7 @@ msfs_pl_pin_cur(
  * SEEK_CUR - find next record in mcell chain of type "rtype"
  */
 
-statusT
+int
 msfs_pl_seek_cur(
 		 domainT *domain,               /* in     */
 		 bsRecCurT *cur,                /* in/out */
@@ -745,7 +745,7 @@ msfs_pl_seek_cur(
   bsMRT   *mrecp;
   caddr_t    rec;
   int     first_pass = TRUE;
-  statusT sts        = EOK;
+  int sts        = EOK;
 
   while (!RECCUR_ISNIL(*cur)) {
     /*
@@ -799,7 +799,7 @@ msfs_pl_seek_cur(
  * NEXT_MC_CUR - advance cursor to the next mcell
  */
 
-statusT 
+int 
 msfs_pl_next_mc_cur(
 		    domainT *domain,            /* in     */
 		    bsRecCurT *cur              /* in/out */
@@ -808,7 +808,7 @@ msfs_pl_next_mc_cur(
   bsMCT *mcellp;
   vdIndexT nextVD;
   bfMCIdT  nextMC;
-  statusT sts = EOK;
+  int sts = EOK;
   
   (void) msfs_pl_cur_to_pnt(domain, cur, &sts);
   if (sts != EOK) {
@@ -1225,7 +1225,7 @@ msfs_pl_set_entry(
   int valuelen, entry_size, large, cell_size, 
       page, name_resid, data_resid;
   bsRecCurT hdr, tmp_hdr;
-  statusT sts = EOK;
+  int sts = EOK;
   ftxHT ftx;
   delPropRootDoneT rdr;
   bsPropListHeadT *hdr_rec;
@@ -1626,7 +1626,7 @@ msfs_pl_fill_hdr_image(
 
 
 
-static statusT
+static int
 msfs_pl_create_rec(
 		   bfAccessT *bfAccess,          /* in     */
 		   bsRecCurT *cur,               /* in/out */
@@ -1638,7 +1638,7 @@ msfs_pl_create_rec(
 {
     caddr_t dat_rec;
     bsMRT *mrecp;
-    statusT sts;
+    int sts;
 
     /*
      * move cur onto it and pin
@@ -1719,7 +1719,7 @@ msfs_pl_findhead_setdata(
   bsRecCurT        dat;
   ushort           n_mcell_alloc;
   uint64T          flags;
-  statusT          sts=EOK;
+  int          sts=EOK;
   caddr_t          recp;
 
   *mcells_alloced = 0;
@@ -2053,7 +2053,7 @@ msfs_pl_alloc_mcell(
 		   ushort nmcell                 /* in     */
 		   )
 {
-    statusT sts = EOK;
+    int sts = EOK;
     bfMCIdT MC = bsNilMCId;
     vdIndexT VD = bsNilVdIndex;
     ftxHT subftx;
@@ -2254,7 +2254,7 @@ msfs_getproplist_int(
 	struct uio uioLcl;
 	struct iovec iovLcl;
 	char *bbuf = NULL;
-        statusT sts = EOK;
+        int sts = EOK;
         int clu_clxtnt_locked=FALSE,
             cow_read_locked=FALSE,
             trunc_xfer_locked=FALSE;
@@ -2440,7 +2440,7 @@ msfs_pl_get_entry(
   bsPropListHeadT *hdr_rec;
   int       error = 0, name_resid, cell_size;
   uint64T rdflags;
-  statusT sts = EOK;
+  int sts = EOK;
   bfAccessT *bfAccess = VTOA(vp);
 
   /*
@@ -2578,7 +2578,7 @@ msfs_pl_get_entry(
  * GET_NAME - read name field of entry pointed to by hdr into buffer
  */
 
-statusT 
+int 
 msfs_pl_get_name(
 		 domainT *domain,               /* in     */
 		 bsRecCurT *hdr,                /* in/out */
@@ -2590,7 +2590,7 @@ msfs_pl_get_name(
   bsPropListHeadT *hdr_rec;
   bsPropListPageT *dat_rec;
   int resid, xfer, namelen;
-  statusT sts;
+  int sts;
 
   /*
    * portion in the header
@@ -2657,7 +2657,7 @@ msfs_pl_get_data(
   char *sec_buff=NULL;
   int sec_data_offset = 0;
   int nbytes = data_resid;
-  statusT sts;
+  int sts;
 
   /*
    * get portion in header record
@@ -2865,7 +2865,7 @@ msfs_delproplist_int(
   char *name_buf = NULL;
   int valuelen, name_resid;
   bsRecCurT hdr;
-  statusT sts = EOK;
+  int sts = EOK;
   ftxHT ftx;
   delPropRootDoneT rdr;
   bsPropListHeadT *hdr_rec;
@@ -3159,7 +3159,7 @@ msfs_pl_del_root_done_int(
   ftxLkT *mcellList_lk;
   int large;
   domainT *domain = ftx.dmnP;
-  statusT sts = EOK;
+  int sts = EOK;
 
  /* TODO: modify to return status */ 
 
@@ -3254,7 +3254,7 @@ msfs_pl_del_data_chain(
 		       ftxHT ftx                /* in     */
 		       )
 {
-  statusT sts = EOK;
+  int sts = EOK;
   mcellPtrRecT fbfm[1];
 
   /*
@@ -3293,7 +3293,7 @@ msfs_pl_del_data_chain(
  * UNLINK_MCELLS - version of unlink that can be called from a root done
  */
 
-statusT
+int
 msfs_pl_unlink_mcells(
 		      domainT *domain,       /* in */
 		      vdIndexT prevVdIndex,  /* in */
@@ -3310,7 +3310,7 @@ msfs_pl_unlink_mcells(
   rbfPgRefHT lastPgPin;
   bsMCT *prevMcell;
   rbfPgRefHT prevPgPin;
-  statusT sts = EOK;
+  int sts = EOK;
   vdT *vd;
 
   vd = VD_HTOP(prevVdIndex, domain);
@@ -3404,7 +3404,7 @@ msfs_pl_set_entry_v3(
   int valuelen, entry_size, large, cell_size, 
       page, name_resid, data_resid;
   bsRecCurT hdr;
-  statusT sts = EOK;
+  int sts = EOK;
   ftxHT ftx;
   delPropRootDoneT rdr;
   bsPropListHeadT_v3 *hdr_rec;
@@ -3767,7 +3767,7 @@ msfs_pl_findhead_setdata_v3(
   ushort n_mcell_alloc;
   uint64T flags;
   int alloced=0, i;
-  statusT sts=EOK;
+  int sts=EOK;
 
   *mcells_alloced = 0;
 
@@ -4108,7 +4108,7 @@ msfs_getproplist_int_v3(
 	struct uio uioLcl;
 	struct iovec iovLcl;
 	char *bbuf = NULL;
-        statusT sts=EOK;
+        int sts=EOK;
         int clu_clxtnt_locked=FALSE,
             cow_read_locked=FALSE,
             trunc_xfer_locked=FALSE;
@@ -4269,7 +4269,7 @@ msfs_pl_get_entry_v3(
   bsPropListHeadT_v3 *hdr_rec;
   int       error = 0, name_resid, cell_size;
   uint64T rdflags;
-  statusT sts;
+  int sts;
 
   /*
    * if entry deleted, exit
@@ -4396,7 +4396,7 @@ msfs_pl_get_entry_v3(
 
 } /* msfs_pl_get_entry_v3() */
 
-statusT 
+int 
 msfs_pl_get_name_v3(
 		 domainT *domain,               /* in     */
 		 bsRecCurT *hdr,                /* in/out */
@@ -4408,7 +4408,7 @@ msfs_pl_get_name_v3(
   bsPropListHeadT_v3 *hdr_rec;
   bsPropListPageT_v3 *dat_rec;
   int resid, xfer, namelen;
-  statusT sts;
+  int sts;
   /*
    * portion in the header
    */
@@ -4471,7 +4471,7 @@ msfs_pl_get_data_v3(
   char *sec_buff=NULL;
   int sec_data_offset = 0;
   int nbytes = data_resid;
-  statusT sts;
+  int sts;
 
   /*
    * get portion in header record
@@ -4634,7 +4634,7 @@ msfs_delproplist_int_v3(
   char *name_buf = NULL;
   int valuelen, name_resid;
   bsRecCurT hdr;
-  statusT sts = EOK;
+  int sts = EOK;
   ftxHT ftx;
   delPropRootDoneT rdr;
   bsPropListHeadT_v3 *hdr_rec;
@@ -4889,7 +4889,7 @@ msfs_pl_del_root_done_int_v3(
   uint64T flags, rdflags;
   ftxLkT *mcellList_lk;
   int large;
-  statusT sts;
+  int sts;
 
   /*
    * recover pointer root-done and domain pointers

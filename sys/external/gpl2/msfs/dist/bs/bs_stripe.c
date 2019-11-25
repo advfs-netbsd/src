@@ -62,7 +62,7 @@
  */
 
 static
-statusT
+int
 stripe_zero_size (
                   bfAccessT *bfAccess,  /* in */
                   uint32T segmentCnt,  /* in */
@@ -72,7 +72,7 @@ stripe_zero_size (
                   );
 
 static
-statusT
+int
 stripe_zero_size_clone (
                         bfAccessT *bfap,             /* in - clone access */
                         bsInMemXtntT *oXtntp,        /* in - original xtnt */
@@ -81,7 +81,7 @@ stripe_zero_size_clone (
                         );
 
 static
-statusT
+int
 stripe_nonzero_size ();
 
 opxT undo_xtnt_rec;
@@ -94,7 +94,7 @@ undo_xtnt_rec (
                );
 
 static
-statusT
+int
 update_xtnt_rec_fields (
                  bfAccessT *bfAccess,  /* in */
                  uint32T segmentSize,  /* in */
@@ -102,7 +102,7 @@ update_xtnt_rec_fields (
                  );
 
 static
-statusT
+int
 create_bf_rel_xtnt_descs (
                           uint32T mapIndex,  /* in */
                           uint32T segmentCnt,  /* in */
@@ -121,7 +121,7 @@ create_bf_rel_xtnt_descs (
 void 
 str_register_stripe_agent(void)
 {
-    statusT sts;
+    int sts;
 
     sts = ftx_register_agent(
                              FTA_BS_STR_STRIPE_V1,
@@ -166,7 +166,7 @@ str_register_stripe_agent(void)
  * This function converts the zero-size bitfile into a striped bitfile.
  */
 
-statusT
+int
 bs_stripe (
            struct bfAccess *bfap,     /* in */
            uint32T segmentCnt,        /* in */
@@ -175,7 +175,7 @@ bs_stripe (
            )
 {
     bfSetT *bfSet;
-    statusT sts;
+    int sts;
 
 
     if (BS_BFTAG_RSVD (bfap->tag)) {
@@ -228,7 +228,7 @@ bs_stripe (
  * This function assumes that the bitfile's in-memory extent map exists.
  */
 
-statusT
+int
 str_stripe (
             bfAccessT *bfap,     /* in */
             uint32T segmentCnt,  /* in */
@@ -240,7 +240,7 @@ str_stripe (
     int ftxFailFlag = 0;
     int i;
     bsStripeHdrT *stripeHdr = NULL;
-    statusT sts;
+    int sts;
     struct vnode *nullvp = NULL;
     bfAccessT *cloneap = NULL;
 
@@ -400,7 +400,7 @@ HANDLE_EXCEPTION:
 }  /* end str_stripe */
 
 
-statusT
+int
 str_stripe_clone (
                   bfAccessT *bfap,      /* in - clone access */
                   bsInMemXtntT *oXtntp, /* in - original xtnt map */
@@ -411,7 +411,7 @@ str_stripe_clone (
     int ftxFailFlag = 0;
     int i;
     bsStripeHdrT *stripeHdr = NULL;
-    statusT sts;
+    int sts;
 
     sts = FTX_START_N(FTA_NULL, &ftxH, pftxH, bfap->dmnP, 0);
     if (sts != EOK) {
@@ -486,7 +486,7 @@ HANDLE_EXCEPTION:
  */
 
 static
-statusT
+int
 stripe_zero_size (
                   bfAccessT *bfap,             /* in */
                   uint32T segmentCnt,          /* in */
@@ -501,7 +501,7 @@ stripe_zero_size (
     bfMCIdT mcellId;
     mcellPoolT mcellType;
     bsStripeHdrT *stripeHdr = NULL;
-    statusT sts;
+    int sts;
     bsInMemSubXtntMapT *subXtntMap;
     int allDisksRefed = FALSE;
     vdT *vdp;
@@ -653,7 +653,7 @@ HANDLE_EXCEPTION:
 /* information (and disks) as the original file */
 
 static
-statusT
+int
 stripe_zero_size_clone (
                         bfAccessT *bfap,             /* in - clone access */
                         bsInMemXtntT *oXtntp,        /* in - original xtnt */
@@ -666,7 +666,7 @@ stripe_zero_size_clone (
     int i;
     bfMCIdT mcellId;
     bsStripeHdrT *stripeHdr = NULL;
-    statusT sts;
+    int sts;
     bsInMemSubXtntMapT *subXtntMap;
     uint32T segmentCnt;
     int allDisksRefed = FALSE;
@@ -794,7 +794,7 @@ HANDLE_EXCEPTION:
  * This function creates the stripe header for a non-zero size bitfile.
  */
 
-static statusT 
+static int 
 stripe_nonzero_size(void)
 {
     return ENOT_SUPPORTED;  /* FIX - do this someday */
@@ -829,7 +829,7 @@ undo_xtnt_rec (
     domainT *domain;
     bsMCT *mcell;
     rbfPgRefHT pgPin;
-    statusT sts;
+    int sts;
     xtntRecUndoRecT *undoRec;
     bsXtntRT *xtntRec;
 
@@ -881,7 +881,7 @@ undo_xtnt_rec (
  */
 
 static
-statusT
+int
 update_xtnt_rec_fields (
                         bfAccessT *bfap,      /* in */
                         uint32T segmentSize,  /* in */
@@ -893,7 +893,7 @@ update_xtnt_rec_fields (
     int ftxFailFlag = 0;
     bsMCT *mcell;
     rbfPgRefHT pgPin;
-    statusT sts;
+    int sts;
     xtntRecUndoRecT undoRec;
     bsXtntRT *xtntRec;
 
@@ -956,7 +956,7 @@ HANDLE_EXCEPTION:
  * and NULLs out the array.
  */
 
-statusT
+int
 str_create_stripe_hdr (
                        uint32T segmentCnt,          /* in */
                        uint32T segmentSize,         /* in */
@@ -1088,7 +1088,7 @@ str_calc_page_alloc (
  * extent-map-page relative extent map.
  */
 
-statusT
+int
 str_create_bf_rel_xtnt_map (
                             bsStripeHdrT *stripeHdr,       /* in */
                             uint32T mapIndex,              /* in */
@@ -1097,7 +1097,7 @@ str_create_bf_rel_xtnt_map (
                             bsInMemXtntMapT **bfXtntMap    /* out */
                             )
 {
-    statusT sts;
+    int sts;
     bsXtntDescT xmXtntDesc;
     bsInMemXtntDescIdT xtntDescId;
     bsInMemXtntMapT *xtntMap = NULL;
@@ -1175,7 +1175,7 @@ HANDLE_EXCEPTION:
  */
 
 static
-statusT
+int
 create_bf_rel_xtnt_descs (
                           uint32T mapIndex,              /* in */
                           uint32T segmentCnt,            /* in */
@@ -1190,7 +1190,7 @@ create_bf_rel_xtnt_descs (
     bsXtntT bsXA[2];
     uint32T pageCnt;
     uint32T startBlkOffset;
-    statusT sts;
+    int sts;
     uint32T xmEndPageOffset;
     uint32T xmPageCnt;
     uint32T xmPageOffset;
