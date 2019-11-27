@@ -56,7 +56,7 @@
  */
 
 static
-statusT
+int
 alloc_bits_page (
                  bfAccessT *sbmbfap,  /* in */
                  uint32T pageOffset,  /* in */
@@ -112,7 +112,7 @@ remove_cache (
               uint32T flags  /* in */
               );
 
-static statusT 
+static int 
 sbm_verify_xor(bsStgBmT *sbmPagep);  /* in - SBM page to verify */
 
 uint32T
@@ -164,7 +164,7 @@ void CANT_SET_TWICE(
     domain_panic( dmnP, "alloc_bits_page: can't set a bit twice!");
 }
 
-statusT
+int
 CANT_CLEAR_TWICE( 
     unsigned mask,
     unsigned pageOffset,
@@ -250,7 +250,7 @@ bitmap_undo_opx (
                  )
 {
 
-    statusT sts;
+    int sts;
     uint32T clustCnt;
     domainT *dmnP;
     vdT *vdp;
@@ -355,7 +355,7 @@ bitmap_rtdn_opx (
 
 init_bs_bitmap_opx ()
 {
-    statusT sts;
+    int sts;
 
     sts = ftx_register_agent(
                              FTA_BS_SBM_ALLOC_BITS_V1,
@@ -439,7 +439,7 @@ sbm_set_pg_bits (
  * sbm_alloc_bits - Allocate the storage bitmap bits that correspond to the
  * clusters "bitOffset" thru "bitOffset+bitCount-1".  
  */
-statusT
+int
 sbm_alloc_bits (
             vdT *vdp,  /* in */
             int bitOffset,  /* in */
@@ -447,7 +447,7 @@ sbm_alloc_bits (
             ftxHT parentFtx  /* in */
             )
 {
-    statusT sts;
+    int sts;
     uint32T sbm_pg, start_sbm_pg, end_sbm_pg;
     int cur_bit, endBit, bits_to_set, set_bits;
     ftxHT ftx;
@@ -512,7 +512,7 @@ HANDLE_EXCEPTION:
  * alloc_bits_page - Allocates the storage bitmap bits on the specified page
  * that correspond to the clusters "startBit" thru "endBit".
  */
-statusT
+int
 alloc_bits_page (
                  bfAccessT *sbmbfap,  /* in */
                  uint32T pageOffset,  /* in */
@@ -523,7 +523,7 @@ alloc_bits_page (
 
 {
 
-    statusT sts;
+    int sts;
     rbfPgRefHT pgRef;
     bsStgBmT *sbmp;
     int firstInt;
@@ -601,7 +601,7 @@ alloc_bits_page (
  * It and the routines it calls MUST NOT START A SUB TRANSACTION.
  */
 static
-statusT
+int
 dealloc_bits_no_sub_ftx (
               vdT *vdp,  /* in */
               int bitOffset,  /* in */
@@ -609,7 +609,7 @@ dealloc_bits_no_sub_ftx (
               ftxHT parentFtx  /* in */
               )
 {
-    statusT sts;
+    int sts;
     uint32T sbm_pg, start_sbm_pg, end_sbm_pg;
     int cur_bit, endBit, bits_to_clr, clr_bits;
 
@@ -656,7 +656,7 @@ dealloc_bits_page (
 
 {
 
-    statusT sts;
+    int sts;
     rbfPgRefHT pgRef;
     bsStgBmT *sbmp;
     int firstInt;
@@ -1234,7 +1234,7 @@ sbm_howmany_blks(
  * all of the blocks in the descriptor are removed then the descriptor is
  * removed from the free list.
  */
-statusT
+int
 sbm_remove_space ( 
                   vdT *vdp,    /* in */
                   uint32T startBlk,  /* in */
@@ -1248,7 +1248,7 @@ sbm_remove_space (
     uint32T startClust = startBlk / vdp->stgCluster;
     stgDescT *newStgDesc;
     domainT *domain;
-    statusT sts;
+    int sts;
 
 
     /* FIX - Sanity check.  Is this check needed? */
@@ -1305,7 +1305,7 @@ EXIT_SBM_REMOVE_SPACE:
  * This function returns the specified blocks to the on-disk free space pool.
  * It and the routines it calls MUST NOT START A SUB TRANSACTION.
  */
-statusT
+int
 sbm_return_space_no_sub_ftx ( 
                   vdT *virtualDiskp,  /* in */
                   uint32T blkOffset,  /* in */
@@ -1317,7 +1317,7 @@ sbm_return_space_no_sub_ftx (
     uint32T clusterCnt;
     uint32T clusterOffset;
     domainT *domain;
-    statusT sts;
+    int sts;
 
 
     clusterCnt = howmany (blkCnt, virtualDiskp->stgCluster);
@@ -1838,7 +1838,7 @@ load_x_cache(
 {
     bfPageRefHT pgref;
     struct bsStgBm* sbmp; /* pointer to storage bitmap page */
-    statusT sts;
+    int sts;
     uint32T 
         pg,               /* current bitmap page number */
         wd,               /* current bitmap word number (within cur page) */
@@ -2201,14 +2201,14 @@ _PAGE_FINISHED:
  *
  * STGMAP lock must be held by caller.
  */
-statusT
+int
 sbm_lock_range (
           vdT *vdp,           /* in */
           uint32T blkOffset, /* in  */
           uint32T blkCnt    /* in */
           )
 {
-    statusT sts = EOK;
+    int sts = EOK;
     uint32T startClust= blkOffset / vdp->stgCluster;
     uint32T numClust = blkCnt / vdp->stgCluster;
 
@@ -2235,7 +2235,7 @@ sbm_lock_range (
  *  if setting start_clust or num_clust to non-zero values, enter
  *  with vdp->stgMap_lk locked.
  */
-statusT
+int
 sbm_lock_unlock_range (
           vdT *vdp,           /* in */
           uint32T startClust, /* in -  zero unlocks */
@@ -2292,7 +2292,7 @@ sbm_lock_unlock_range (
 /*
  * sbm_init - Initializes the free storage list.
  */
-statusT
+int
 sbm_init (
           vdT *vdp  /* in */
           )
@@ -2391,7 +2391,7 @@ sbm_init (
  * sbm_clear_cache - Scans through the free and reserved storage list and removes
  * the storage descriptors.
  */
-statusT
+int
 sbm_clear_cache (
                  vdT *vdp  /* in */
                  )
@@ -2417,7 +2417,7 @@ sbm_total_free_space (
 {
     bfPageRefHT pgref;
     struct bsStgBm* sbmp; /* pointer to storage bitmap page */
-    statusT sts;
+    int sts;
     int bm_pgs,           /* number of whole pages */
         last_bm_pg_wds,   /* number of words in last page */
         last_bm_wd_bits,  /* number of bits in last word */
@@ -2553,7 +2553,7 @@ sbm_dump (
           )
 {
     stgDescT *cur_desc = vdp->freeStgLst;
-    statusT sts;
+    int sts;
 
 
     printf( "freeStgLst = 0x%x\n", cur_desc );
@@ -2594,7 +2594,7 @@ sbm_dump (
  * caller must ensure block range is != reserved bmt blocks.
  */
 
-statusT
+int
 sbm_scan (
            vdT *vdp, /* in */
            uint32T startBlk,  /* in */
@@ -2604,7 +2604,7 @@ sbm_scan (
 {
     bfPageRefHT pgref;
     struct bsStgBm* sbmp; /* pointer to storage bitmap page */
-    statusT sts;
+    int sts;
     logDescT *ldP;
     uint32T
         curClust,         /* starting  cluster in range input*/
@@ -2853,7 +2853,7 @@ _PAGE_FINISHED:
  * Caller holds stgmap lock.
  */
 
-statusT
+int
 sbm_scan_v3_v4 (
        vdT *vdp,             /* in */
        uint64T reqClustSize, /* in */
@@ -2867,7 +2867,7 @@ sbm_scan_v3_v4 (
 {
     bfPageRefHT pgref;
     struct bsStgBm* sbmp; /* pointer to storage bitmap page */
-    statusT sts;
+    int sts;
     logDescT *ldP;
     uint64T
         curr_clust_cnt=0, /* running number of clusters processed */
@@ -3046,7 +3046,7 @@ _PAGE_FINISHED:
         }
 
         if (pg_refed == TRUE) {
-            statusT sts2 = EOK;
+            int sts2 = EOK;
             sts2 = bs_derefpg(pgref, BS_CACHE_IT);
             pg_refed = FALSE;
             if (sts2 != EOK) {
@@ -3114,7 +3114,7 @@ _PAGE_FINISHED:
 }
 
 
-static statusT 
+static int 
 sbm_verify_xor(bsStgBmT *sbmPagep)
 {
     uint32T currWd,                 /* Current word we are examining */

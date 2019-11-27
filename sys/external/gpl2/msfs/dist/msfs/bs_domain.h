@@ -637,7 +637,7 @@ bs_bfdmn_flush_sync(
                     domainT* dmnp
                     );
 
-statusT
+int
 advfs_enum_domain_devts(
                   char *domain,               /* in */
                   bsDevtListT *DevtList       /* out */
@@ -652,7 +652,7 @@ cfs_xid_free_memory_int(
                     domainT *dmnp
                    );
 
-statusT
+int
 find_del_entry (
                 domainT *domain,              /* in */
                 bfTagT bfSetTag,              /* in */
@@ -662,14 +662,14 @@ find_del_entry (
                 int *delFlag                  /* out */
                 );
 
-statusT
+int
 bs_fix_root_dmn (
                  bfDmnDescT *dmntbl,          /* in */
                  domainT *dmnP,               /* in */
                  char *dmnName                /* in */
                  );
 
-statusT
+int
 bs_check_root_dmn_sc (
                  domainT *dmnP                /* in */
                  );

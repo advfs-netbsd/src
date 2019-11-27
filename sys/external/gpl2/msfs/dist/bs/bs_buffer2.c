@@ -102,13 +102,13 @@ prefetch(
       ioDescT **ioListp,      /* out - list of ioDesc */
       int doRead,             /* in - do we (TRUE) or caller (FALSE) do read */
       short metaCheck,        /* in - metadata check type */
-      vm_offset_t offset,     /* in - starting offset */
-      vm_size_t len,          /* in - number of bytes */
+      vsize_t offset,     /* in - starting offset */
+      vsize_t len,          /* in - number of bytes */
       int ubc_flags           /* in - ubc control */
       );
 
 static
-statusT
+int
 bs_refpg_int(
          bfPageRefHT *bfPageRefH,       /* out */
          void **bfPageAddr,             /* out - address of bf data */
@@ -118,13 +118,13 @@ bs_refpg_int(
          int getflag,                   /* in - is getpage the caller? */
          int fetchPages,                /* in */
          short metaCheck,               /* in - metadata check type */
-         vm_offset_t offset,            /* in - starting offset */
-         vm_size_t len,                 /* in - number of bytes */
+         vsize_t offset,            /* in - starting offset */
+         vsize_t len,                 /* in - number of bytes */
          int ubc_flags                  /* in - ubc control */
          );
 
 static
-statusT
+int
 bs_pinpg_clone( bfPageRefHT *bfPageRefH,    /* out */
          void **bfPageAddr,                 /* out - address of bf data */
          struct bfAccess* bfap,             /* in */
@@ -133,13 +133,13 @@ bs_pinpg_clone( bfPageRefHT *bfPageRefH,    /* out */
          ftxHT ftxH,                        /* in */
          int flag,                          /* in */
          short metaCheck,                   /* in - metadata check type */
-         vm_offset_t offset,                /* in - starting offset */
-         vm_size_t len,                     /* in - number of bytes */
+         vsize_t offset,                /* in - starting offset */
+         vsize_t len,                     /* in - number of bytes */
          int ubc_flags                      /* in - ubc control */
          );
 
 static
-statusT
+int
 bs_pinpg_found( bfPageRefHT *bfPageRefH,      /* out */
                void **bfPageAddr,             /* out */
                struct bfAccess *bfap,         /* in */
@@ -148,13 +148,13 @@ bs_pinpg_found( bfPageRefHT *bfPageRefH,      /* out */
                struct vm_page *pp,                  /* in */
                int flag,                      /* in */
                short metaCheck,               /* in - metadata check type */
-               vm_offset_t offset,            /* in - starting offset */
-               vm_size_t len,                 /* in - number of bytes */
+               vsize_t offset,            /* in - starting offset */
+               vsize_t len,                 /* in - number of bytes */
                int ubc_flags                  /* in - ubc control */
                );
 
 static
-statusT
+int
 bs_pinpg_newpage( bfPageRefHT *bfPageRefH,      /* out */
                  void **bfPageAddr,             /* out */
                  struct bfAccess *bfap,         /* in */
@@ -163,13 +163,13 @@ bs_pinpg_newpage( bfPageRefHT *bfPageRefH,      /* out */
                  struct vm_page *pp,                  /* in */
                  int flag,                      /* in */
                  short metaCheck,               /* in - metadata check type */
-                 vm_offset_t offset,            /* in - starting offset */
-                 vm_size_t len,                 /* in - number of bytes */
+                 vsize_t offset,            /* in - starting offset */
+                 vsize_t len,                 /* in - number of bytes */
                  int ubc_flags                  /* in - ubc control */
                  );
 
 static
-statusT
+int
 bs_pinpg_one_int( bfPageRefHT *bfPageRefH,  /* out */
          void **bfPageAddr,                 /* out */
          struct bfAccess* bfap,             /* in */
@@ -177,8 +177,8 @@ bs_pinpg_one_int( bfPageRefHT *bfPageRefH,  /* out */
          bfPageRefHintT refHint,            /* in */
          int flag,                          /* in */
          short metaCheck,                   /* in - metadata check type */
-         vm_offset_t offset,                /* in - starting offset */
-         vm_size_t len,                     /* in - number of bytes */
+         vsize_t offset,                /* in - starting offset */
+         vsize_t len,                     /* in - number of bytes */
          int ubc_flags                      /* in - ubc control */
          );
 
@@ -194,8 +194,8 @@ seq_ahead_cont(
     struct bsBuf *bp,       /* in */
     unsigned long bsPage,   /* in - bf page number */
     short metaCheck,        /* in - metadata check type */
-    vm_offset_t offset,     /* in - starting offset */
-    vm_size_t len,          /* in - number of bytes */
+    vsize_t offset,     /* in - starting offset */
+    vsize_t len,          /* in - number of bytes */
     int ubc_flags           /* in - ubc control */
     );
 
@@ -208,8 +208,8 @@ seq_ahead_start(
     ioDescT **ioListp,      /* out - list of ioDesc */
     unsigned long bsPage,   /* in - bf page number */
     short metaCheck,        /* in - metadata check type */
-    vm_offset_t offset,     /* in - starting offset */
-    vm_size_t len,          /* in - number of bytes */
+    vsize_t offset,     /* in - starting offset */
+    vsize_t len,          /* in - number of bytes */
     int ubc_flags           /* in - ubc control */
     );
 
@@ -221,8 +221,8 @@ seq_ahead( struct bfAccess *ap,         /* in */
             int *listLen,               /* in/out */
             ioDescT **ioListp,          /* out */
             short metaCheck,            /* in - metadata check type */
-            vm_offset_t offset,         /* in - starting offset */
-            vm_size_t len,              /* in - number of bytes */
+            vsize_t offset,         /* in - starting offset */
+            vsize_t len,              /* in - number of bytes */
             int ubc_flags               /* in - ubc control */
     );
 
@@ -295,7 +295,7 @@ advfs_page_get(struct bsBuf *bp, int flags)
 {
     struct uvm_object* vop = bp->bfAccess->bfObj;
     struct vm_page *pp = bp->vmpage;
-    vm_offset_t     offset;
+    vsize_t     offset;
     int             result;
 
     offset = bp->bfPgNum * ADVFS_PGSZ;
@@ -326,11 +326,11 @@ advfs_page_get(struct bsBuf *bp, int flags)
 #define STEPLIM 20
 
 
-static statusT
+static int
 blkMap( struct bsBuf *bp, bfAccessT *bfap )
 {
     int step = 0;
-    statusT res;
+    int res;
     int i;
 
     /*
@@ -402,7 +402,7 @@ blkMap( struct bsBuf *bp, bfAccessT *bfap )
  *    struct uucred *cred            User's creditials.  Need for writes if
  *                                  storage needs to be added.
  */
-statusT
+int
 blkmap_direct(struct bsBuf *bp,
               bfAccessT *bfap,
               unsigned long starting_block,
@@ -413,7 +413,7 @@ blkmap_direct(struct bsBuf *bp,
     unsigned long next_block;
     int bytes_left = nbytes;
     int bytes_mapped;
-    statusT res;
+    int res;
     ioDescT *ioDesc_Array = (ioDescT *)NULL;
     int ioDesc_count = 0;
     vdIndexT vdIndex;
@@ -745,20 +745,20 @@ blkmap_direct(struct bsBuf *bp,
  * Version of bs_refpg called from msfs_getpage.
  */
 
-statusT
+int
 bs_refpg_get(
          struct bfAccess *bfap,         /* in */
          unsigned long bsPage,          /* in - bf page number */
          bfPageRefHintT refHint,        /* in - hint to do read ahead */
          struct vm_page **pp,                 /* out - vm_page struct pointer */
-         vm_offset_t offset,            /* in - future use */
-         vm_size_t len,                 /* in - future use */
+         vsize_t offset,            /* in - future use */
+         vsize_t len,                 /* in - future use */
          int ubc_flags                  /* in - ubc control */
          )
 {
     struct bsBuf *bp;
     void *bfPageAddr;
-    statusT sts;
+    int sts;
     
     sts = bs_refpg_int( (bfPageRefHT *)&bp, &bfPageAddr,
                          bfap, bsPage, refHint, TRUE, 0, BSBUF_CHK_NONE,
@@ -772,7 +772,7 @@ bs_refpg_get(
     return(sts);
 }
 
-statusT
+int
 bs_refpg(
          bfPageRefHT *bfPageRefH,       /* out */
          void **bfPageAddr,             /* out - address of bf data */
@@ -786,7 +786,7 @@ bs_refpg(
                          NULL, 0, 0, B_READ);
 }
 
-statusT
+int
 bs_refpg_fetch(
          bfPageRefHT *bfPageRefH,       /* out */
          void **bfPageAddr,             /* out - address of bf data */
@@ -805,7 +805,7 @@ bs_refpg_fetch(
  * Wrapper for reading (R)BMT pages.  Tests page validity.
  * Can't be called during domain init when bfap is NULL. see bs_map_bf
  */
-statusT
+int
 bmt_refpg(
          bfPageRefHT *bfPageRefH,       /* out */
          void **bfPageAddr,             /* out - address of bf data */
@@ -814,7 +814,7 @@ bmt_refpg(
          bfPageRefHintT refHint         /* in - hint to do read ahead */
          )
 {
-    statusT sts;
+    int sts;
 
     /* bfap, bfap->dmnP, and dmnVersion must be set up */
     KASSERT(bfap->dmnP->dmnVersion);
@@ -845,7 +845,7 @@ bmt_refpg(
  */
 
 static
-statusT
+int
 bs_refpg_newpage(
                  bfPageRefHT *bfPageRefH,     /* out */
                  void **bfPageAddr,           /* out - address of bf data */
@@ -856,8 +856,8 @@ bs_refpg_newpage(
                  struct vm_page *pp,                /* in - UBC page pointer */
                  int fetchPages,              /* in - # of pages to prefetch */
                  short metaCheck,             /* in - metadata check type */
-                 vm_offset_t offset,          /* in - starting offset */
-                 vm_size_t len,               /* in - number of bytes */
+                 vsize_t offset,          /* in - starting offset */
+                 vsize_t len,               /* in - number of bytes */
                  int ubc_flags                /* in - ubc control */
                 )
 {
@@ -867,7 +867,7 @@ bs_refpg_newpage(
     struct bsBuf *bp;
     int s;
     int listLen = 0;
-    statusT sts = EOK;
+    int sts = EOK;
 
     /* Initialize a new buffer descriptor. 
      * Other threads are blocked on the vm_page's pg_busy flag 
@@ -1057,7 +1057,7 @@ bs_refpg_newpage(
  */
 
 static
-statusT
+int
 bs_refpg_int(
          bfPageRefHT *bfPageRefH,    /* out */
          void **bfPageAddr,          /* out - address of bf data */
@@ -1067,8 +1067,8 @@ bs_refpg_int(
          int getflag,                /* in - is msfs_getpage() the caller? */
          int fetchPages,             /* in */
          short metaCheck,            /* in - metadata check type */
-         vm_offset_t offset,         /* in - starting offset for read */
-         vm_size_t len,              /* in - number of bytes to read */
+         vsize_t offset,         /* in - starting offset for read */
+         vsize_t len,              /* in - number of bytes to read */
          int ubc_flags               /* in - ubc control */
          )
 {
@@ -1077,7 +1077,7 @@ bs_refpg_int(
     struct vm_page *pp;
     ioDescT *ioListp;
     struct flags flag;
-    statusT sts;
+    int sts;
     int cowLkLocked = FALSE;
     int useOrigMap = FALSE;
     int flags;
@@ -1285,7 +1285,7 @@ exit:
  *                                     1 if there is (out)
  */
 
-statusT
+int
 bs_refpg_direct(void *addr,                    /* in */
                 int number_to_read,            /* in */
                 struct bfAccess *bfap,         /* in */
@@ -1298,7 +1298,7 @@ bs_refpg_direct(void *addr,                    /* in */
 {
     struct bfAccess *origbfap = (struct bfAccess *)NULL;
     struct bsBuf *bp;
-    statusT sts = EOK;
+    int sts = EOK;
     unsigned long i;
     int npages, nbytes;
     ioDescT *desc_flink, *desc_blink;
@@ -1309,8 +1309,8 @@ bs_refpg_direct(void *addr,                    /* in */
     vm_map_t mymap = (vm_map_t)NULL;
     bfSetT *bfSetp = bfap->bfSetp;
     int clear_bufs = 0;
-    vm_offset_t start;
-    vm_offset_t end;
+    vsize_t start;
+    vsize_t end;
     bfPageRefHT bfPageRefH;
     char *bfPageAddr;
     unsigned int dirty;
@@ -1548,8 +1548,8 @@ bs_refpg_direct(void *addr,                    /* in */
     KASSERT( seg_flag == UIO_USERSPACE ? !aio_bp : 1 );
     if ( (seg_flag == UIO_USERSPACE) && !(bfap->origAccp) && !(aio_bp) ) {
         mymap = current_task()->map;
-        start = (vm_offset_t)trunc_page(addr);
-        end = (vm_offset_t)round_page((vm_offset_t)addr + number_to_read -
+        start = (vsize_t)trunc_page(addr);
+        end = (vsize_t)round_page((vsize_t)addr + number_to_read -
                                       *number_read);
         if (vm_map_pageable(mymap, start, end, VM_PROT_WRITE) != KERN_SUCCESS){
             sts = EFAULT;
@@ -1699,7 +1699,7 @@ bs_refpg_direct(void *addr,                    /* in */
  */
 
 
-statusT
+int
 bs_derefpg(
            bfPageRefHT bfPageRefH,      /* in */
            bfPageCacheHintT cacheHint   /* in */
@@ -1741,18 +1741,18 @@ bs_derefpg(
  * counter remains unchanged.
  */
 
-statusT
+int
 bs_pinpg_get(
          struct bfAccess *bfap,         /* in */
          unsigned long bsPage,          /* in - bf page number */
          bfPageRefHintT refHint,        /* in - hint to do read ahead */
          struct vm_page **pp,                 /* out - vm_page struct pointer */
-         vm_offset_t offset,            /* in - future use */
-         vm_size_t len,                 /* in - future use */
+         vsize_t offset,            /* in - future use */
+         vsize_t len,                 /* in - future use */
          int ubc_flags                  /* in - ubc control */
          )
 {
-    statusT sts;
+    int sts;
     struct bsBuf *bp;
     void *bfPageAddr;
     void (* q_fn)(ioDescT *, int);
@@ -1895,7 +1895,7 @@ retry_lookup:
     return sts;
 }
 
-statusT
+int
 bs_pinpg( bfPageRefHT *bfPageRefH,      /* out */
          void **bfPageAddr,             /* out */
          struct bfAccess *bfap,         /* in */
@@ -1907,7 +1907,7 @@ bs_pinpg( bfPageRefHT *bfPageRefH,      /* out */
                             BSBUF_CHK_NONE, NULL, 0, 0, B_WRITE ) );
 }
 
-statusT
+int
 bs_pinpg_ftx( bfPageRefHT *bfPageRefH,       /* out */
               void **bfPageAddr,             /* out */
               struct bfAccess* bfap,         /* in */
@@ -1935,13 +1935,13 @@ bs_pinpg_ftx( bfPageRefHT *bfPageRefH,       /* out */
  *     dirty to clean list.
  */
 
-statusT
+int
 bs_pinpg_put(struct vm_page *plp,             /* in */
              int plcnt,                 /* in */
              int ubc_flags)             /* in */
 {
     struct bsBuf * bp;
-    statusT sts;
+    int sts;
     void (* q_fn)(ioDescT *, int) = bs_q_lazy;
     int listLen = 0;
     ioDescT *ioListp;
@@ -2144,7 +2144,7 @@ bs_pinpg_put(struct vm_page *plp,             /* in */
  */
 
 static
-statusT
+int
 bs_pinpg_clone( bfPageRefHT *bfPageRefH,   /* out */
          void **bfPageAddr,                /* out */
          struct bfAccess* bfap,            /* in */
@@ -2153,12 +2153,12 @@ bs_pinpg_clone( bfPageRefHT *bfPageRefH,   /* out */
          ftxHT ftxH,                       /* in */
          int flag,                         /* in */
          short metaCheck,                  /* in - metadata check type */
-         vm_offset_t offset,               /* in - starting offset */
-         vm_size_t len,                    /* in - number of bytes */
+         vsize_t offset,               /* in - starting offset */
+         vsize_t len,                    /* in - number of bytes */
          int ubc_flags                     /* in - ubc control */
          )
 {
-    statusT sts = EOK;
+    int sts = EOK;
     bfSetT *bfSetp;
 
     bfSetp = bfap->bfSetp;
@@ -2255,7 +2255,7 @@ bs_wakeup_flush_threads(struct bsBuf *bp,   /* in - Buffer being released */
                 AdvfsLockStats->bfFlushBroadcast++;
             bfap->flushWaiterQ.cnt--;
 
-            thread_wakeup((vm_offset_t) curFlushWaiter);
+            thread_wakeup((vsize_t) curFlushWaiter);
 
             ms_free(curFlushWaiter);
             curFlushWaiter = nextFlushWaiter;
@@ -2322,7 +2322,7 @@ bs_wakeup_flush_threads(struct bsBuf *bp,   /* in - Buffer being released */
             KASSERT(rfp->outstandingIoCount > 0);
 
             if (--rfp->outstandingIoCount == 0) {
-                thread_wakeup_one((vm_offset_t)&rfp->outstandingIoCount);
+                thread_wakeup_one((vsize_t)&rfp->outstandingIoCount);
             }
             mutex_exit(&rfp->rangeFlushLock);
 
@@ -2348,7 +2348,7 @@ bs_wakeup_flush_threads(struct bsBuf *bp,   /* in - Buffer being released */
  */
 
 /* TO DO: it would be nice to pass the check in, but too much work now! */
-statusT
+int
 bs_pinpg_int(
          bfPageRefHT *bfPageRefH,       /* out */
          void **bfPageAddr,             /* out */
@@ -2388,7 +2388,7 @@ bs_pinpg_int(
  */
 
 static
-statusT
+int
 bs_pinpg_one_int(
                  bfPageRefHT *bfPageRefH,       /* out */
                  void **bfPageAddr,             /* out */
@@ -2397,13 +2397,13 @@ bs_pinpg_one_int(
                  bfPageRefHintT refHint,        /* in */
                  int flag,                      /* in */
                  short metaCheck,               /* in - metadata check type */
-                 vm_offset_t offset,            /* in - future use */
-                 vm_size_t len,                 /* in - future use */
+                 vsize_t offset,            /* in - future use */
+                 vsize_t len,                 /* in - future use */
                  int ubc_flags                  /* in - ubc control */
                 )
 {
     struct bsBuf *bp = NULL;
-    statusT sts = EOK;
+    int sts = EOK;
     struct vm_page *pp;
     int uflags, directIO;
     extern REPLICATED int SS_is_running;
@@ -2445,7 +2445,7 @@ bs_pinpg_one_int(
          * we fall into bs_pinpg_found() to handle the page flushing.
          */
         if ( (flag & PINPG_DIO_REMOVE) && !(uflags & B_DIRTY) ) {
-            vm_offset_t offset = pp->pg_offset;
+            vsize_t offset = pp->pg_offset;
 
             /* release it the same way we got it to keep counts correct */
             ubc_page_release(pp, ubc_flags);
@@ -2507,7 +2507,7 @@ bs_pinpg_one_int(
  * up until bs_derefpg.
  */
 static
-statusT
+int
 bs_pinpg_found(
                bfPageRefHT *bfPageRefH,       /* out */
                void **bfPageAddr,             /* out */
@@ -2517,15 +2517,15 @@ bs_pinpg_found(
                struct vm_page *pp,                  /* in */
                int flag,
                short metaCheck,               /* in - metadata check type */
-               vm_offset_t offset,            /* in - future use */
-               vm_size_t len,                 /* in - future use */
+               vsize_t offset,            /* in - future use */
+               vsize_t len,                 /* in - future use */
                int ubc_flags                  /* in - ubc control */
               )
 {
     int wait = 0;
     int listLen = 0;
     ioDescT *ioListp;
-    statusT sts = EOK;
+    int sts = EOK;
     struct bsBuf *bp;
     int noqfnd;
 
@@ -2738,7 +2738,7 @@ bs_pinpg_found(
  */
 
 static
-statusT
+int
 bs_pinpg_newpage(
                  bfPageRefHT *bfPageRefH,       /* out */
                  void **bfPageAddr,             /* out */
@@ -2748,13 +2748,13 @@ bs_pinpg_newpage(
                  struct vm_page *pp,                  /* in */
                  int flag,
                  short metaCheck,               /* in - metadata check type */
-                 vm_offset_t offset,            /* in - future use */
-                 vm_size_t len,                 /* in - future use */
+                 vsize_t offset,            /* in - future use */
+                 vsize_t len,                 /* in - future use */
                  int ubc_flags                  /* in - ubc control */
                 )
 {
     struct bsBuf *bp = NULL;
-    statusT sts = EOK;
+    int sts = EOK;
     int s, listLen = 0;
     ioDescT *ioListp;
 
@@ -2955,7 +2955,7 @@ bs_pinpg_newpage(
  *                                     blkmap_direct().
  */
 
-statusT
+int
 bs_pinpg_direct(void *addr,
                 int number_to_write,           /* in */
                 struct bfAccess *bfap,         /* in */
@@ -2969,7 +2969,7 @@ bs_pinpg_direct(void *addr,
                 struct uucred *cred)            /* in */
 {
     struct bsBuf *bp;
-    statusT sts = EOK;
+    int sts = EOK;
     unsigned long i;
     int wait = 0;
     bfSetT *cloneSetp = NULL;
@@ -2980,8 +2980,8 @@ bs_pinpg_direct(void *addr,
     int nbytes;
     ioDescT *desc_flink, *desc_blink;
     int list_cnt;
-    vm_offset_t start;
-    vm_offset_t end;
+    vsize_t start;
+    vsize_t end;
     fsFragStateT frag_state_before;
 
     bfPageRefHT bfPageRefH;
@@ -3236,8 +3236,8 @@ bs_pinpg_direct(void *addr,
     if ( seg_flag == UIO_USERSPACE && !aio_bp ) {
 
         mymap = current_task()->map;
-        start = (vm_offset_t)trunc_page((vm_offset_t)addr);
-        end = (vm_offset_t)round_page((vm_offset_t)addr +
+        start = (vsize_t)trunc_page((vsize_t)addr);
+        end = (vsize_t)round_page((vsize_t)addr +
                                       number_to_write - *number_written);
 
         /* Wire the user's data buffer.  */
@@ -3386,7 +3386,7 @@ bs_pinpg_direct(void *addr,
  * ( clean, dirty, or immediate ) unpin the page.
  */
 
-statusT
+int
 bs_unpinpg(
            bfPageRefHT bfPageRefH,      /* in */
            logRecAddrT wrtAhdLogAddr,   /* in - LOG case only */
@@ -3394,7 +3394,7 @@ bs_unpinpg(
            )
 {
     struct bsBuf *bp;
-    statusT sts;
+    int sts;
     bfPgRlsModeT pgRlsMode = modeNcache.rlsMode;
     bfPageCacheHintT cacheHint = modeNcache.cacheHint;
     struct bfAccess *logbfap;
@@ -4186,7 +4186,7 @@ state_block(
  * Return a bad status if the ref handle is invalid.
  */
 
-statusT
+int
 bs_set_bufstate(
                 bfPageRefHT bfPageRefH,  /* in */
                 int ln,  /* in */
@@ -4226,7 +4226,7 @@ bs_set_bufstate(
  * Return a bad status if the ref handle is invalid.
  */
 
-statusT
+int
 bs_clear_bufstate(
                   bfPageRefHT bfPageRefH,  /* in */
                   uint32T stateBit  /* in */
@@ -4252,7 +4252,7 @@ bs_clear_bufstate(
  * Return a bad status if the ref handle is invalid.
  */
 
-statusT
+int
 bs_get_bufstate(
     bfPageRefHT bfPageRefH,      /* in */
     unsigned whichStateBit,      /* in */
@@ -4372,7 +4372,7 @@ clear_state (
  * is pinned.
  */
 
-statusT
+int
 buf_remap(
    bfPageRefHT bfPageRefH,      /* in */
    blkMapT *blkMap )            /* in */
@@ -4435,8 +4435,8 @@ seq_ahead_cont(
     struct bsBuf *bp,       /* in */
     unsigned long bsPage,   /* in - bf page number */
     short metaCheck,        /* in - metadata check type */
-    vm_offset_t offset,     /* in - starting offset */
-    vm_size_t len,          /* in - number of bytes */
+    vsize_t offset,     /* in - starting offset */
+    vsize_t len,          /* in - number of bytes */
     int ubc_flags           /* in - ubc control */
     )
 {
@@ -4550,8 +4550,8 @@ prefetch(
     ioDescT **ioListp,      /* out - list of ioDesc */
     int doRead,             /* in - do we (TRUE) or caller (FALSE) do read */
     short metaCheck,        /* in - metadata check type */
-    vm_offset_t offset,     /* in - starting offset */
-    vm_size_t len,          /* in - number of bytes */
+    vsize_t offset,     /* in - starting offset */
+    vsize_t len,          /* in - number of bytes */
     int ubc_flags           /* in - ubc control */
     )
 {
@@ -4594,8 +4594,8 @@ seq_ahead_start(
     ioDescT **ioListp,      /* out - list of ioDesc */
     unsigned long bsPage,   /* in - bf page number */
     short metaCheck,        /* in - metadata check type */
-    vm_offset_t offset,     /* in - starting offset */
-    vm_size_t len,          /* in - number of bytes */
+    vsize_t offset,     /* in - starting offset */
+    vsize_t len,          /* in - number of bytes */
     int ubc_flags           /* in - ubc control */
 
     )
@@ -4709,15 +4709,15 @@ seq_ahead( struct bfAccess *bfap,       /* in */
             int *listLen,               /* in/out */
             ioDescT **ioListp,          /* out */
             short metaCheck,            /* in - metadata check type */
-            vm_offset_t offset,         /* in - starting offset */
-            vm_size_t len,              /* in - number of bytes */
+            vsize_t offset,         /* in - starting offset */
+            vsize_t len,              /* in - number of bytes */
             int ubc_flags               /* in - ubc control */
           )
 {
     struct bsBuf *bp = NULL;
     int numBlks = 0;
     int s;
-    statusT sts;
+    int sts;
     ioDescT *ioDescp;
     int endPage;
     int cowLkLocked = FALSE;
@@ -5164,12 +5164,12 @@ startover:
      */
 
     if ( pageCnt == 0 ) {
-        (void)ubc_invalidate( bfap->bfObj, (vm_offset_t)0,
-                              (vm_size_t)0, B_INVAL);
+        (void)ubc_invalidate( bfap->bfObj, (vsize_t)0,
+                              (vsize_t)0, B_INVAL);
     } else {
         (void)ubc_invalidate( bfap->bfObj,
-                (vm_offset_t)pageOffset * ADVFS_PGSZ,
-                (vm_size_t)pageCnt * ADVFS_PGSZ,
+                (vsize_t)pageOffset * ADVFS_PGSZ,
+                (vsize_t)pageCnt * ADVFS_PGSZ,
                 B_INVAL);
     }
 
@@ -5291,7 +5291,7 @@ msfs_flush_and_invalidate(
         do {
             ubc_flush_dirty(bfap->bfObj, B_DONE);
             if (bfap->bfObj->vu_dirtypl || bfap->bfObj->vu_dirtywpl) {
-                assert_wait_mesg((vm_offset_t)0,FALSE,"flush_and_invalidate");
+                assert_wait_mesg((vsize_t)0,FALSE,"flush_and_invalidate");
                 thread_set_timeout(1);
                 thread_block();
             }
@@ -5304,7 +5304,7 @@ msfs_flush_and_invalidate(
     if (fiflags & (INVALIDATE_UNWIRED | INVALIDATE_ALL)) {
         KASSERT(!(fiflags & NO_INVALIDATE));
         /* pass in B_DONE to flush any dirty pages before invalidating pages */
-        ubc_invalidate(bfap->bfObj, (vm_offset_t)0, (vm_size_t)0,
+        ubc_invalidate(bfap->bfObj, (vsize_t)0, (vsize_t)0,
                        fiflags & INVALIDATE_UNWIRED ?
                        (B_DONE | B_ACTIVE) : B_DONE);
     }

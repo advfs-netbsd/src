@@ -61,7 +61,7 @@
 #include "../msfs/bs_index.h"
 
 static int copyin_domain_and_set_names(char *in_dmnTbl, char *in_setName, char *in_setName2, char **out_dmnTbl, char **out_setName, char **out_setName2);
-static statusT open_set(mode_t setMode, mode_t dmnMode, int setOwner, int dmnOwner, bfSetIdT setId, bfSetT **retBfSetp, domainT **dmnPP);
+static int open_set(mode_t setMode, mode_t dmnMode, int setOwner, int dmnOwner, bfSetIdT setId, bfSetT **retBfSetp, domainT **dmnPP);
 static void validate_syscall_structs(void);
 void bs_get_global_stats(opGetGlobalStatsT *stats);
 
@@ -658,7 +658,7 @@ free_domain_and_set_names(
  * Used by the syscalls to open a domain via its ID.
  */
 
-static statusT
+static int
 open_domain(
     mode_t mode,       /* in - access mode (read, write, etc.) */
     int ownerOnly,     /* in - indicates if only owner is allowed access */
@@ -666,7 +666,7 @@ open_domain(
     domainT **dmnPP    /* out - pointer to open domain */
     )
 {
-    statusT sts;
+    int sts;
     bfDmnParamsT *dmnParamsp = NULL;
     int dmnActive = FALSE, dmnOpen = FALSE;
 
@@ -748,7 +748,7 @@ close_domain(
  * Used by the syscalls to open a set via its ID.
  */
 
-static statusT
+static int
 open_set(
     mode_t setMode,     /* in - access mode (read, write, etc) for the set */
     mode_t dmnMode,     /* in - access mode for the set's domain */
@@ -759,7 +759,7 @@ open_set(
     domainT **dmnPP     /* out - set's open domain pointer */
     )
 {
-    statusT sts;
+    int sts;
     bfSetParamsT setParams;
     int dmnOpen = FALSE, setOpen = FALSE;
 
@@ -896,7 +896,7 @@ msfs_real_syscall(
 
     register libParamsT *libBufp = NULL;
 
-    statusT sts = EOK;
+    int sts = EOK;
     int size, error=0;
     int docopyout = 0;
     struct vnode *vp = NULL;
@@ -3861,7 +3861,7 @@ msfs_syscall_op_get_dmn_params(libParamsT *libBufp)
           );
 
     if ( sts == EOK ) {
-        extern statusT getLogStats(domainT *dmnP, logStatT *logStatp);
+        extern int getLogStats(domainT *dmnP, logStatT *logStatp);
 
         sts = getLogStats(dmnP, &libBufp->getDmnParams.dmnParams.mlLogStat);
     }
@@ -4656,7 +4656,7 @@ msfs_syscall_op_rem_volume(libParamsT *libBufp, opIndexT opIndex)
         bfSetParamsT bfsetParams;
         uint32T setIdx = 0;
         uint32T userId;
-        statusT sts2=EOK;
+        int sts2=EOK;
         struct mount *pmp = NULL;
         bfSetT* bfSetp;
 
@@ -4773,7 +4773,7 @@ HANDLE_EXCEPTION:
 mlStatusT
 msfs_syscall_op_ss_set_params(libParamsT *libBufp)
 {
-    statusT sts=EOK;
+    int sts=EOK;
     bfDomainIdT domainId;
     mlSSDmnParamsT *ssDmnParamsp = &libBufp->ssSetParams.ssDmnParams;
     domainT *dmnP;
@@ -4841,7 +4841,7 @@ HANDLE_EXCEPTION:
 mlStatusT
 msfs_syscall_op_ss_get_params(libParamsT *libBufp)
 {
-    statusT sts=EOK;
+    int sts=EOK;
     bfDomainIdT domainId;
     bsSSDmnAttrT ssAttr;
     int dmnActive=FALSE;
@@ -4925,7 +4925,7 @@ HANDLE_EXCEPTION:
 mlStatusT
 msfs_syscall_op_ss_get_fraglist(libParamsT *libBufp)
 {
-    statusT sts=EOK;
+    int sts=EOK;
     bfDomainIdT domainId;
     vdIndexT volIndex = 0;
     int vd_refed=FALSE;
@@ -5020,7 +5020,7 @@ HANDLE_EXCEPTION:
 mlStatusT
 msfs_syscall_op_ss_get_hotlist(libParamsT *libBufp)
 {
-    statusT sts = EOK;
+    int sts = EOK;
     mlBfDomainIdT bfDomainId;
     int dmn_ref=FALSE;
     domainT *dmnP;
@@ -5153,7 +5153,7 @@ msfs_syscall_op_add_rem_vol_svc_class(libParamsT *libBufp)
         bfSetParamsT bfsetParams;
         uint32T setIdx = 0;
         uint32T userId;
-        statusT sts2=EOK;
+        int sts2=EOK;
         struct mount *pmp = NULL;
         bfSetT *bfSetp;
 
@@ -5974,7 +5974,7 @@ validate_syscall_structs(
     KDASSERT( BS_CLIENT_AREA_SZ == ML_CLIENT_AREA_SZ);
     KDASSERT( BFM_RSVD_CELLS == ML_BFM_RSVD_CELLS );
     KDASSERT( sizeof( uint32T ) == sizeof( u32T ) );
-    KDASSERT( sizeof( statusT ) == sizeof( mlStatusT ) );
+    KDASSERT( sizeof( int ) == sizeof( mlStatusT ) );
     KDASSERT( sizeof( bfTagT ) == sizeof( mlBfTagT ) );
     KDASSERT( sizeof( bsIdT ) == sizeof( mlIdT ) );
     KDASSERT( sizeof( bfDomainIdT ) == sizeof( mlBfDomainIdT ) );
@@ -5998,7 +5998,7 @@ validate_syscall_structs(
  *  BF_INHERIT_A_TO_IA  * copy parent's attributes to childs both *
  */
 
-statusT
+int
 bs_inherit(
     bfAccessT *parentbfap,
     bfAccessT *childbfap,
@@ -6006,7 +6006,7 @@ bs_inherit(
     ftxHT ftxH
     )
 {
-    statusT sts;
+    int sts;
     bsBfAttrT childAttr;
     bsBfInheritAttrT parentInheritAttr;
     extern int AdvfsAllDataLogging;
@@ -6079,13 +6079,13 @@ bs_inherit(
 }
 
 
-statusT
+int
 bs_inherit_init(
     bfAccessT *bfap,
     ftxHT ftxH
     )
 {
-    statusT sts;
+    int sts;
     int sz;
     bsBfClAttrT bfClientAttr = { 0 };
     extern int AdvfsAllDataLogging;
@@ -6234,12 +6234,12 @@ msfs_process_deferred_delete_list(
  *  cleared since the domain will be deallocated following relocation.
  */
 
-statusT
+int
 msfs_set_domain_relocating_flag(
                                 bfDomainIdT dmnId    /* in */
                                )
 {
-    statusT sts;
+    int sts;
     domainT *dmnp;
 
     sts = bs_domain_access( &dmnp, dmnId, FALSE );

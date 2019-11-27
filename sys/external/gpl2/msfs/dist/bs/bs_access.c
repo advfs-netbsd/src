@@ -146,7 +146,7 @@ typedef struct {
 
 /* private protos */
 
-static statusT
+static int
 get_n_setup_new_vnode(
                       bfAccessT *bfap,
                       bfSetT *bfSetp,    /* in - BF-set descriptor pointer */
@@ -333,7 +333,7 @@ cleanup_closed_list(clupClosedListTypeT clean_type)
     bfAccessT *nextp;
     struct fsContext* contextp;
     lkStatesT state;
-    statusT   ret;
+    int   ret;
     unsigned long css;
     unsigned long cic;
     int pass_2 = 0;
@@ -690,7 +690,7 @@ _retry:
              * more work, don't clear the running flag here.
              */
             if (FreeAcc.len && SentCleanupMsg) {
-                thread_wakeup((vm_offset_t)&SentCleanupMsg);
+                thread_wakeup((vsize_t)&SentCleanupMsg);
             }
             mutex_exit(&BfAccessFreeLock);
             assert_wait_mesg_timo(NULL, FALSE, "AdvFS delay", 1);
@@ -713,18 +713,18 @@ _retry:
     /* Wake up any threads waiting in get_free_acc() */
     if (SentCleanupMsg) {
         SentCleanupMsg = 0;
-        thread_wakeup((vm_offset_t)&SentCleanupMsg);
+        thread_wakeup((vsize_t)&SentCleanupMsg);
     }
     mutex_exit(&BfAccessFreeLock);
 
     switch (clean_type) {
         case CLEANUP_ANY:
             /* Wake up any threads waiting in get_free_acc() */
-            thread_wakeup((vm_offset_t)(&ClosedAccCleanInProgress));
+            thread_wakeup((vsize_t)(&ClosedAccCleanInProgress));
             break;
         case CLEANUP_STATS:
             /* Wake up any threads waiting in get_free_acc() */
-            thread_wakeup((vm_offset_t)(&ClosedAccCleanStatsInProgress));
+            thread_wakeup((vsize_t)(&ClosedAccCleanStatsInProgress));
             break;
         default:
             /* shouldn't be here */
@@ -754,7 +754,7 @@ bfs_flush_dirty_stats(bfSetT *bfSetp,
     bfAccessT *bfap;
     bfAccessT *nextp;
     lkStatesT state;
-    statusT   ret;
+    int   ret;
     struct vnode *vp;
     
     
@@ -1041,7 +1041,7 @@ get_free_acc(int *retry,        /* In/Out - Retry or error status */
      */
     if (sent_alloc_msg) {
         cleanup_times_blocked_waiting_for_cleanup++;
-        assert_wait((vm_offset_t)(&BfapAllocInProgress), FALSE);
+        assert_wait((vsize_t)(&BfapAllocInProgress), FALSE);
         mutex_exit(&BfAccessFreeLock);
         thread_block();
         mutex_enter(&BfAccessFreeLock);
@@ -1077,7 +1077,7 @@ get_free_acc(int *retry,        /* In/Out - Retry or error status */
          */
 
         if (SentCleanupMsg) {
-            assert_wait((vm_offset_t)(&SentCleanupMsg), FALSE);
+            assert_wait((vsize_t)(&SentCleanupMsg), FALSE);
             mutex_exit(&BfAccessFreeLock);
             thread_block();
             return (NULL);
@@ -1447,7 +1447,7 @@ bs_invalidate_rsvd_access_struct(
                                  )
 {
     bfAccessT *tbfap;
-    statusT sts;
+    int sts;
 
     /*
      * Kick all the bitfile's buffers out of the buffer cache.
@@ -1515,12 +1515,12 @@ bs_invalidate_rsvd_access_struct(
  */
 
 
-statusT
+int
 bs_reclaim_cfs_rsvd_vn(
                        bfAccessT *bfap  /* in */
                        )
 {
-    statusT sts = EOK;
+    int sts = EOK;
     struct vnode *vp = NULL;
     struct fileSetNode *fsp = NULL;
     char    *fnamep = NULL;
@@ -1731,7 +1731,7 @@ bs_init_area()
  *      needed.
  */
 
-statusT
+int
 bs_map_bf(
           bfAccessT* bfap,         /* in/out - ptr to bitfile's access struct */
           uint32T options,         /* in - options flags (see bs_access.h) */
@@ -1741,7 +1741,7 @@ bs_map_bf(
     struct vd* vdp;
     struct domain* dmnP;
     bfPageRefHT pgref;
-    statusT sts;
+    int sts;
     struct bsMPg* bmtp;
     struct bsMC* mcp;
     bsBfAttrT* bfattrp;
@@ -2050,7 +2050,7 @@ bs_insmntque(
  * reserved bitfiles.
  */
 
-statusT
+int
 bfm_open_ms(
             bfAccessT **outbfap,        /* out - access structure pointer */
             domainT* dmnP,              /* in - domain pointer */
@@ -2059,7 +2059,7 @@ bfm_open_ms(
             )
 {
     bfTagT tag;
-    statusT sts;
+    int sts;
     struct vnode *nullvp = NULL;
 
     BS_BFTAG_RSVD_INIT(tag, bfDDisk, bfMIndex);
@@ -2119,7 +2119,7 @@ bfm_open_ms(
  * Returns status from bs_access_one routine call.
  */
 
-statusT
+int
 bs_access(
           bfAccessT **outbfap,     /* out - access structure pointer */
           bfTagT tag,              /* in - tag of bf to access */
@@ -2130,7 +2130,7 @@ bs_access(
           struct vnode **vp        /* in/out - from bs_access_one */
           )
 {
-    statusT sts;
+    int sts;
     bfAccessT *origbfap;
     struct vnode *nullvp = NULL;
 
@@ -2177,7 +2177,7 @@ bs_access(
  * or various status returns from tagdir_lookup and mask_diskbf.
  */
 
-statusT
+int
 bs_access_one(
               bfAccessT **outbfap, /* out - access structure pointer */
               bfTagT tag,          /* in - tag of bf to access */
@@ -2192,7 +2192,7 @@ bs_access_one(
     bfAccessT *bfap;
     bfMCIdT bfMCId;
     vdIndexT vdIndex;
-    statusT sts;
+    int sts;
     unLkActionT unlkAction = UNLK_NEITHER;
     struct vnode *vp = NULL,
                  *clu_clone_vnode_to_vrele = NULL;
@@ -3165,7 +3165,7 @@ int xxx_vnode_cnt = 0;
  * Vnode not accessible (not on mount queue)
  */
 
-static statusT
+static int
 get_n_setup_new_vnode(
                       bfAccessT *bfap,
                       bfSetT *bfSetp,    /* in - BF-set descriptor pointer */
@@ -3173,7 +3173,7 @@ get_n_setup_new_vnode(
                       )
 {
     struct vnode *vp = NULL;
-    statusT sts;
+    int sts;
     struct bfNode *bnp;
     struct fsContext* fscp;
     bfSetIdT bfSetId;
@@ -3678,14 +3678,14 @@ lookup:
 ************** bitfile close routines ********************************
 **********************************************************************/
 
-statusT
+int
 bs_close(
          bfAccessT *bfAccessp, /* in */
          int options           /* in */
          )
 {
     bfSetT *bfSetp;
-    statusT sts;
+    int sts;
 
     if (bfAccessp == NULL) {
         return( EINVALID_HANDLE );
@@ -3734,7 +3734,7 @@ bs_close(
  * Returns EOK, EINVALID_HANDLE
  */
 
-statusT
+int
 bs_close_one (
               bfAccessT *bfap,          /* in/out */
               int options,              /* in */
@@ -3744,7 +3744,7 @@ bs_close_one (
     ftxHT ftxH;
     lkStatesT prevState;
     vdT *delVdp;
-    statusT sts;
+    int sts;
     void *delList;
     uint32T delCnt = 0;
     bfMCIdT delMCId;
@@ -4519,7 +4519,7 @@ bf_setup_truncation (
                      int made_frag
                      )
 {
-    statusT sts;
+    int sts;
     long pagesUsed;
     uint32T delCnt;
 
@@ -4559,13 +4559,13 @@ bf_setup_truncation (
  * the given tag's sequence number is zero.
  */
 
-statusT
+int
 bs_get_current_tag(
                    bfSetT *bfSetp,       /* in */
                    bfTagT *bfTag         /* in/out */
                    )
 {
-    statusT sts;
+    int sts;
     bfMCIdT bfMCId;
     vdIndexT vdIndex;
 
@@ -4850,7 +4850,7 @@ void
 bs_init_access_alloc_thread(void)
 {
     extern task_t  first_task;
-    statusT        sts;
+    int        sts;
 
     /*
      * Create a message queue which threads will use to send
@@ -5003,7 +5003,7 @@ bs_access_alloc_thread(void)
          * Wakeup any threads waiting on BfapAllocInProgress
          * in get_free_acc().
          */
-        thread_wakeup((vm_offset_t)(&BfapAllocInProgress));
+        thread_wakeup((vsize_t)(&BfapAllocInProgress));
 
         /*
          * Put this message back on the free message queue.
@@ -5242,7 +5242,7 @@ remove_actRange_from_list( bfAccessT *bfap,
                  bfap->actRangeList.arCount++;
 
                  /* only one thread ever sleeps on a given range */
-                 thread_wakeup_one((vm_offset_t)waitp );
+                 thread_wakeup_one((vsize_t)waitp );
                  waitp = nextwaiterp;
             }
         }
@@ -5321,7 +5321,7 @@ page_to_active_range(
  * given page. The active range may contain the page in its entirety,
  * but it may also only partially overlap it.
  */
-statusT
+int
 limits_of_active_range(
     bfAccessT *bfap,
     bsPageT pg,

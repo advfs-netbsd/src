@@ -84,7 +84,7 @@ struct {
 extern TestXtntsFlg;
 
 extern vm_map_t kernel_map;
-extern vm_offset_t virtualZeroRangeP;
+extern vsize_t virtualZeroRangeP;
 
 #ifdef ADVFS_SMP_ASSERT
 int ForceStgAddFailure = 0;
@@ -96,7 +96,7 @@ int ForceStgAddFailure = 0;
 static char MegaSafePageOfZeros[ADVFS_PGSZ];
 
 static
-statusT
+int
 uiomove_frag (
            bfFragIdT fragId,  /* in */
            uint32T copyByteOffset,  /* in */
@@ -105,13 +105,13 @@ uiomove_frag (
            struct uio *uio  /* in */
            );
 
-statusT
+int
 bcopy_frag (
             struct vnode* vp,
             char* pgAddr
             );
 
-static statusT
+static int
 fs_write_direct(bfAccessT *bfap,
                 struct uio *uio,
                 struct uucred *cred,
@@ -121,7 +121,7 @@ fs_write_direct(bfAccessT *bfap,
                 int ioflag,
                 actRangeT *arp );
 
-static statusT
+static int
 fs_read_direct(bfAccessT *bfap,
                struct uio *uio,
                int *nbytes,
@@ -156,12 +156,12 @@ fs_zero_fill_pages(
     struct uucred *cred             /* in - credentials of caller */
     )
 {
-    statusT sts;
+    int sts;
     unsigned pg;
     bfPageRefHT page_ref;
     int *page_addr;
     int npages = end_pg - start_pg + 1;
-    vm_offset_t vm_start, ret;
+    vsize_t vm_start, ret;
     int asynch_io_started = FALSE;
     int bytes_written, bytes_to_transfer, number_to_write;
     long starting_blk_num;
@@ -586,7 +586,7 @@ fs_write(
          struct uucred *cred             /* in - credentials of caller */
          )
 {
-    statusT ret;
+    int ret;
     unsigned long page_to_write, starting_byte, size;
     unsigned long efbig = 0;
     unsigned long f_offset, bytes_left, bytes_written;
@@ -672,7 +672,7 @@ fs_write(
     if ( bfap->dmnP->dmnFlag & BFD_DOMAIN_FLUSH_IN_PROGRESS ) {
         mutex_enter( &bfap->dmnP->mutex );
         if ( bfap->dmnP->dmnFlag & BFD_DOMAIN_FLUSH_IN_PROGRESS ) {
-            assert_wait((vm_offset_t)(&bfap->dmnP->dmnFlag), FALSE);
+            assert_wait((vsize_t)(&bfap->dmnP->dmnFlag), FALSE);
             mutex_exit( &bfap->dmnP->mutex );
             thread_block();
         } else {
@@ -2028,7 +2028,7 @@ fs_update_times(struct vnode *vp, int attr_flags)
  *                                         racing thread modifying the end of
  *                                         the file, one gets passed in.
  */
-static statusT
+static int
 fs_write_direct(bfAccessT *bfap,
                 struct uio *uio,
                 struct uucred *cred,
@@ -2038,7 +2038,7 @@ fs_write_direct(bfAccessT *bfap,
                 int ioflag,
                 actRangeT *arp )
 {
-    statusT ret;
+    int ret;
     int block_in_page = (int)(byte_offset_in_page / BS_BLKSIZE);
     int byte_offset_in_blk = 
                    (int)(byte_offset_in_page - block_in_page * BS_BLKSIZE );
@@ -2670,7 +2670,7 @@ fs_write_add_stg(
     struct vnode *vp = bfap->bfVp;
     domainT *dmnP = bfap->dmnP;
     unsigned long next_file_pg, pgs_needed, pgs_prealloc, first_pg_to_add;
-    statusT sts;
+    int sts;
     ftxHT ftxH;
     int ftx_started = FALSE, ret = EOK;
     unsigned long pgs_to_add, pgs_added = 0, pgs_zeroed;
@@ -3131,7 +3131,7 @@ fs_read(
         struct uucred *cred             /* in - credentials of caller    */
         )
 {
-    statusT ret;
+    int ret;
     int valid_data;
     unsigned long page_to_read, bytes_left, starting_byte;
     unsigned long nbyte, f_offset, total_size;
@@ -3153,10 +3153,10 @@ fs_read(
     int map_lock = 0;
     int i;
     vm_map_t directio_map = (vm_map_t)NULL;
-    vm_offset_t start, end, addr;
+    vsize_t start, end, addr;
     typedef struct page_stats {
-        vm_offset_t start;      /* starting page */
-        vm_offset_t end;        /* ending page   */
+        vsize_t start;      /* starting page */
+        vsize_t end;        /* ending page   */
     } pgStatT;
     pgStatT local_pg_stats,
             *pg_statp = NULL, 
@@ -3194,7 +3194,7 @@ fs_read(
     if ( bfap->dmnP->dmnFlag & BFD_DOMAIN_FLUSH_IN_PROGRESS ) {
         mutex_enter( &bfap->dmnP->mutex );
         if ( bfap->dmnP->dmnFlag & BFD_DOMAIN_FLUSH_IN_PROGRESS ) {
-            assert_wait((vm_offset_t)(&bfap->dmnP->dmnFlag), FALSE);
+            assert_wait((vsize_t)(&bfap->dmnP->dmnFlag), FALSE);
             mutex_exit( &bfap->dmnP->mutex );
             thread_block();
         } else {
@@ -3425,7 +3425,7 @@ _retry_map:
                         pg_statp = &local_pg_stats;
                     
                     for (i = 0;  i < uio->uio_iovcnt; i++ ) {
-                        addr  = (vm_offset_t)uio->uio_iov[i].iov_base;
+                        addr  = (vsize_t)uio->uio_iov[i].iov_base;
                         start = trunc_page(addr);
                         end   = round_page(addr + uio->uio_iov[i].iov_len);
                         ret = vm_map_pageable(directio_map, 
@@ -3659,7 +3659,7 @@ _retry_map:
         if (ioflag & IO_RSYNC)
         {
             MSFS_SYNC_STATS(msfs_sync_stats.fs_read_sync_flush++);
-            if(error = msfs_syncdata(vp, FWRITE, f_offset, (vm_size_t)number_to_read, cred))
+            if(error = msfs_syncdata(vp, FWRITE, f_offset, (vsize_t)number_to_read, cred))
                 goto _error;
         }
 
@@ -3767,13 +3767,13 @@ _error:
  *                                       (out)Number of bytes actually read(out)
  *    unsigned long byte_offset_in_page  Starting byte offset in page (in)
  */
-static statusT
+static int
 fs_read_direct(bfAccessT *bfap,
                struct uio *uio,
                int *nbytes,
                unsigned long byte_offset_in_page)
 {
-    statusT ret;
+    int ret;
     int block_in_page = byte_offset_in_page / BS_BLKSIZE;
     int byte_offset_in_blk = (int)(byte_offset_in_page - block_in_page * BS_BLKSIZE );
     ulong page_to_read = uio->uio_offset / ADVFS_PGSZ;
@@ -4101,7 +4101,7 @@ EXIT:
 }
 
 
-statusT
+int
 copy_and_del_frag (
                    struct vnode *vp,
                    struct uucred *cred,
@@ -4110,7 +4110,7 @@ copy_and_del_frag (
                    )
 {
     bfPageRefHT pgPin;
-    statusT sts;
+    int sts;
     char *pgAddr = NULL;
     struct bfAccess *bfap = VTOA(vp);
     uint32T fragPageOffset = bfap->fragPageOffset;
@@ -4207,7 +4207,7 @@ EXIT_COPY_AND_DEL_FRAG:
 }  /* end copy_and_del_frag */
 
 
-statusT
+int
 bcopy_frag (
             struct vnode* vp,
             char* pgAddr
@@ -4215,7 +4215,7 @@ bcopy_frag (
 {
     uint32T fragByteCnt;
     bfPageRefHT pgRef;
-    statusT sts;
+    int sts;
     uint32T subFrag1ByteCnt;
     uint32T subFrag1ByteOffset;
     uint32T sizeoffset;
@@ -4308,7 +4308,7 @@ HANDLE_EXCEPTION:
  */
 
 static
-statusT
+int
 uiomove_frag (
            bfFragIdT fragId,  /* in */
            uint32T copyByteOffset,  /* in */
@@ -4319,7 +4319,7 @@ uiomove_frag (
 {
     int err;
     uint32T fragByteCnt;
-    statusT sts;
+    int sts;
     uint32T subFrag1ByteCnt;
     uint32T subFrag1ByteOffset;
     char *subFrag1Page = NULL;

@@ -35,7 +35,7 @@
 
 struct bsMPg* get_bmt_pgptr(domainT * dmnP);
 
-statusT
+int
 bmt_set_mcell_free_list(
     vdT* vdp            /* in - pointer to current disk */
     );
@@ -60,7 +60,7 @@ void mcell_trace( uint16T, uint32T, uint16T, uint16T, uint16T, void* );
 
 #endif /* ADVFS_MCELL_TRACE */
 
-statusT
+int
 bmt_alloc_prim_mcell(
                ftxHT ftxH,              /* in - callers ftx handle */
                mcellUIdT* mcellUIdp,    /* in/out - mcelluid ptr */
@@ -69,7 +69,7 @@ bmt_alloc_prim_mcell(
                struct bsMC   **p_mcp    /* out - New mcell      */
                );
 
-statusT
+int
 bmt_alloc_mcell (
                  bfAccessT * bfAccess,  /* in */
                  uint16T poolVdIndex,   /* in */
@@ -82,12 +82,12 @@ bmt_alloc_mcell (
                  int forceFlag          /* in */
                  );
 
-statusT
+int
 deferred_free_mcell ( vdT *vd,
                       bfMCIdT mcellId,
                       ftxHT pftxH);
 
-statusT
+int
 bmt_alloc_link_mcell (
                       domainT *dmnP,        /* in */
                       uint16T poolVdIndex,  /* in */
@@ -98,7 +98,7 @@ bmt_alloc_link_mcell (
                       bfMCIdT *retMcellId  /* out */
                       );
 
-statusT
+int
 bmt_find_mcell (
                 domainT *dmnP,  /* in */
                 uint16T bfSearchVdIndex,  /* in */
@@ -109,7 +109,7 @@ bmt_find_mcell (
                 bfMCIdT *bfPrevMCId  /* out */
                 );
 
-statusT
+int
 bmt_link_mcells (
                  domainT *domain,  /* in */
                  bfTagT bfTag, /* in */
@@ -122,7 +122,7 @@ bmt_link_mcells (
                  ftxHT parentFtx  /* in */
                  );
 
-statusT
+int
 bmt_unlink_mcells (
                    domainT *domain,  /* in */
                    bfTagT bfTag, /* in */
@@ -161,7 +161,7 @@ bmt_init_page(
               int dmnVersion            /* on-disk version number */
               );
 
-statusT
+int
 bmtr_clone_recs(
     bfMCIdT sMCId,
     uint16T sVdIndex,
@@ -172,7 +172,7 @@ bmtr_clone_recs(
     ftxHT parentFtxH
     );
 
-statusT
+int
 bmtr_put_rec_n_unlk_int(
     bfAccessT *bfap,            /* in - bf access structure */
     u_short rType,              /* in - type of record */
@@ -183,7 +183,7 @@ bmtr_put_rec_n_unlk_int(
     long xid                    /* in - CFS transaction id */
     );
 
-statusT
+int
 bmtr_update_rec(
     bfAccessT *bfap,            /* in - bf access structure */
     u_short rType,              /* in - type of record */
@@ -193,7 +193,7 @@ bmtr_update_rec(
     uint32T flags               /* in - flags */
     );
 
-statusT
+int
 bmtr_update_rec_n_unlk(
     bfAccessT *bfap,            /* in - bf access structure */
     u_short rType,              /* in - type of record */
@@ -203,7 +203,7 @@ bmtr_update_rec_n_unlk(
     bmtrLkT lk                  /* in - unlock mcell? */
     );
 
-statusT
+int
 allocate_link_new_mcell (
                          bfAccessT *bfAccess,  /* in */
                          vdIndexT oldVdIndex,  /* in */
@@ -253,7 +253,7 @@ bmtr_find(
  * caller's responsibility to deref the page in that case.
  */
 
-statusT
+int
 bmtr_scan(
           void **bsrp,          /* out - pointer to BMT record */
           bfPageRefHT *pgref,   /* out - pgref of BMT cell's page */
@@ -288,7 +288,7 @@ typedef struct bsBfDesc {
     metadataTypeT metadataType;
 }  bsBfDescT;
 
-statusT
+int
 bmt_get_vd_bf_descs (
                      domainT *dmnP,  /* in */
                      vdIndexT vdIndex,  /* in */
@@ -309,14 +309,14 @@ typedef struct bmtH {
    bsMPgT *pgPtr;
 } bmtHT;
 
-statusT
+int
 bmt_open( 
            bmtHT *bmth,         /* out */
            domainT *dmnP,     /* in */
            vdIndexT vdIndex      /* in */
            );
 
-statusT
+int
 bmt_read( 
            bmtHT *bmth,  /* in - BMT handle */
            bfTagT *bfSetTag,   /* out */
@@ -324,7 +324,7 @@ bmt_read(
            metadataTypeT *metadataType  /* out */
            );
 
-statusT
+int
 bmt_close( 
             bmtHT *bmth  /* in */
             );
@@ -333,23 +333,23 @@ bmt_close(
  ***  BMT mcell integrety checking routines                              ***
  ***************************************************************************/
 
-statusT
+int
 check_mcell_ptr( vdIndexT vdi, bfMCIdT mcid, bfTagT tag, domainT *dmnp);
 
 void check_BMT_pg(struct bsBuf *bp);
 
-statusT
+int
 check_mcell_hdr( bsMCT *mcp, bfAccessT *bfap);
 
-statusT
+int
 check_BSR_XTNTS_rec( bsXtntRT *bsXtntRp, bfAccessT *bfap, vdT *vdp);
 
-statusT
+int
 check_BSR_SHADOW_XTNTS_rec( bsShadowXtntT *bsShadowXtntp,
                             bfAccessT *bfap,
                             vdT *vdp);
 
-statusT
+int
 check_BSR_XTRA_XTNTS_rec( bsXtraXtntRT *bsXtraXtntRp,
                           bfAccessT *bfap,
                           vdT *vdp,

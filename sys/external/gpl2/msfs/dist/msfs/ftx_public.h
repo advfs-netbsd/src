@@ -127,7 +127,7 @@ typedef void opxT (
  * versions of the same agent.
  *
  */
-statusT
+int
 ftx_register_agent_n2(ftxAgentIdT agentId, /* in - agent id */
                       opxT *undoOpX,       /* in - undo opx proc ptr */
                       opxT *rootDnOpX,     /* in - root done opx proc ptr */
@@ -136,7 +136,7 @@ ftx_register_agent_n2(ftxAgentIdT agentId, /* in - agent id */
                                 /* Note - opX routines must NOT fail !! */
                    );
 
-statusT
+int
 ftx_register_agent_n(ftxAgentIdT agentId, /* in - agent id */
                    opxT *undoOpX,       /* in - undo opx proc ptr */
                    opxT *rootDnOpX,     /* in - root done opx proc ptr */
@@ -145,7 +145,7 @@ ftx_register_agent_n(ftxAgentIdT agentId, /* in - agent id */
                    );
 
 
-statusT
+int
 ftx_register_agent(ftxAgentIdT agentId, /* in - agent id */
                    opxT *undoOpX,   /* in - undo opx routine ptr */
                    opxT *rootDnOpX  /* in - root done opx routine ptr */
@@ -215,7 +215,7 @@ ftx_register_agent(ftxAgentIdT agentId, /* in - agent id */
 #endif /* FTX_MAX_RECOVERY_PASS */
 
 
-statusT
+int
 _ftx_start_i(
     ftxHT *ftxH,                /* out - ftx handle */
     ftxHT parentFtxH,           /* in - parent ftx handle */
@@ -405,7 +405,7 @@ ftx_done_fs(
             long server_only
             );
 
-statusT
+int
 ftx_done(
          ftxHT ftxH,            /* in - leaf ftx handle */
          ftxAgentIdT agentId,   /* in - opx agent id */
@@ -509,7 +509,7 @@ struct bfAccess;
  * rbf_create - recoverable bitfile create
  */
 
-statusT
+int
 rbf_create(
            bfTagT *tag,                 /* out */
            bfSetT *bfSetp,              /* in */
@@ -524,7 +524,7 @@ void ftbs_create(void);  /* obsolete */
  * rbf_delete - recoverable bitfile deletion
  */
 
-statusT
+int
 rbf_delete(
            struct bfAccess *bfap,       /* in */
            ftxHT parentFtx              /* in */
@@ -534,7 +534,7 @@ rbf_delete(
  * rbf_add_stg - recoverable bitfile storage allocation
  */
 
-statusT
+int
 rbf_add_stg( 
             struct bfAccess *bfap,          /* in */
             unsigned long pageOFfset,       /* in */
@@ -543,7 +543,7 @@ rbf_add_stg(
             int checkmigtrunclock           /* in */
             );
 
-statusT
+int
 rbf_add_overlapping_stg( 
                         struct bfAccess *bfap,          /* in */
                         unsigned long pageOFfset,       /* in */
@@ -566,7 +566,7 @@ typedef struct rbfPgRefH {
     unsigned pgHndl : 8;        /* page ref handle */
 } rbfPgRefHT;
 
-statusT
+int
 rbf_pinpg( 
           rbfPgRefHT *rbfPgRefH,        /* out */
           void **bfPageAddr,            /* out */
@@ -643,7 +643,7 @@ get_ftx_id(ftxHT ftxH           /* in - ftx handle */
 void
 ftx_init(void);
 
-statusT
+int
 rbf_set_bfset_params(
     bfSetT *bfSetp,             /* in - bitfile-set's descriptor pointer */
     bfSetParamsT *bfSetParams,  /* in - bitfile-set's params */

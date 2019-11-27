@@ -170,7 +170,7 @@
 
 /* Prototypes for static functions. */
 
-static statusT
+static int
 tagdir_set_tagmap_common(
     tagInfoT *tip,
     int markInUse
@@ -206,7 +206,7 @@ typedef struct {
  * TODO: Is a free list operation racing with this function possible?
  */
 
-statusT
+int
 tagdir_get_info(
     bfSetT *bfSetp,                         /* in - bitfile set desc ptr */
     unsigned long *firstUninitPage,         /* out - next page to use */
@@ -216,7 +216,7 @@ tagdir_get_info(
     )
 {
     bfAccessT *tdap;
-    statusT sts;
+    int sts;
     bsTDirPgT *tdpgp;
     bfPageRefHT pgRef;
     uint32T pg;
@@ -275,7 +275,7 @@ tagdir_get_info(
 void
 init_tagdir_opx(void)
 {
-    statusT sts;
+    int sts;
 
     if ((sts = ftx_register_agent_n(FTA_BS_TAG_EXTEND_TAGDIR_V1, 
                                   0, 0, extend_tagdir_redo_opx)) != EOK) {
@@ -311,7 +311,7 @@ tagdir_remove_tag(
     ftxHT ftxH           /* in - transaction handle */
     )
 {
-    statusT sts;
+    int sts;
     unsigned long tagPg;
     int slot;
     rbfPgRefHT pgRef;
@@ -369,7 +369,7 @@ tagdir_tag_to_freelist(
     int set_tag_to_unused/* in - if TRUE, turn off in-use flag */
     )
 {
-    statusT sts;
+    int sts;
     unsigned long tagPg;
     int slot;
     rbfPgRefHT pgRef;
@@ -505,7 +505,7 @@ tagdir_freetag_dellist(
     vdT *pvdp          /* in - vd of deferred delete list */
     )
 {
-    statusT sts;
+    int sts;
     bfSetIdT bfSetId;
     bfSetT *bfSetp = NULL;
     domainT *dmnP = pvdp->dmnP;
@@ -588,7 +588,7 @@ HANDLE_EXCEPTION:
  * page will not work.
  */
 
-static statusT
+static int
 init_next_tag_page(
                    unsigned long tagPg, /* in - page to init */
                    bfSetT* bfSetp,      /* in - ptr to bitfile set */
@@ -598,7 +598,7 @@ init_next_tag_page(
                    )
 {
     rbfPgRefHT pgRef;
-    statusT sts;
+    int sts;
     bsTDirPgT *tdpgp;
     int slot;
     int i;
@@ -696,7 +696,7 @@ init_next_tag_page(
  * with the tag dir locked in the parent ftx.
  */
 
-statusT
+int
 tagdir_alloc_tag(
     ftxHT parentFtxH,           /* in - transaction handle */
     mcellUIdT* mcellUIdp,       /* in/out - ptr mcell uid (tag rtnd) */
@@ -710,7 +710,7 @@ tagdir_alloc_tag(
     bsTMapT *tdmap;
     unsigned long tagPg;
     rbfPgRefHT pgRef;
-    statusT sts;
+    int sts;
     bsTDirPgT *tdpgp;
     bsTDirPgT* tdpg0p;
     unsigned int slot;
@@ -879,7 +879,7 @@ extend_tagdir_redo_opx(
                        )
 {
     tagUnInitPageRedoT* uipp = (tagUnInitPageRedoT*)opRec;
-    statusT sts;
+    int sts;
     bfSetT* bfSetp;
     domainT *dmnP = ftxH.dmnP;
 
@@ -929,7 +929,7 @@ HANDLE_EXCEPTION:
  * after I've been up all night squashing these routines.
  */
 
-statusT
+int
 tagdir_insert_tag(
                   ftxHT parentFtxH,
                   mcellUIdT* mcellUIdp, /* in - mcelluid ptr */
@@ -939,7 +939,7 @@ tagdir_insert_tag(
                   rbfPgRefHT tdpgRef
                   )
 {
-    statusT sts;
+    int sts;
     int nextTMap;
 
     /*
@@ -996,13 +996,13 @@ tagdir_insert_tag(
  * specified tag next, if free, else return an error.
  */
 
-statusT
+int
 tagdir_set_next_tag(
                     bfSetT *bfSetp,     /* in - bitfile set desc ptr */
                     bfTagT *tag         /* in - next tag value to use */
                     )
 {
-    statusT sts;
+    int sts;
     bsTDirPgT *tdpgntp, *tdpg0p;
     rbfPgRefHT pgntRef, pg0Ref;
     unsigned long tagPg;
@@ -1298,7 +1298,7 @@ fail:
  * Change what the tag points to.
  */
 
-statusT
+int
 tagdir_reset_tagmap(
     tagInfoT *tip
     )
@@ -1311,7 +1311,7 @@ tagdir_reset_tagmap(
  * Stuff the tag in the clone.
  */
 
-statusT
+int
 tagdir_stuff_tagmap(
     tagInfoT *tip
     )
@@ -1326,7 +1326,7 @@ tagdir_stuff_tagmap(
  * Initialize a new tag in the specified bitfile set.
  */
 
-static statusT
+static int
 tagdir_set_tagmap_common(
     tagInfoT *tip,
     int markInUse
@@ -1337,7 +1337,7 @@ tagdir_set_tagmap_common(
     int slot;
     bfSetT *bfSetp;
     ftxHT ftxH;
-    statusT sts;
+    int sts;
     rbfPgRefHT pgRef;
     bsTDirPgT *tdpgp;
     tagDataRecT tagDataRec;
@@ -1399,7 +1399,7 @@ tagdir_write_undo_opx(
     unsigned long tagPg;
     unsigned slot;
     domainT *dmnP;
-    statusT sts;
+    int sts;
     int bfs_opened = 0;
 
 
@@ -1463,7 +1463,7 @@ HANDLE_EXCEPTION:
  * ENO_SUCH_TAG.
  */
 
-statusT
+int
 tagdir_lookup(
     bfSetT *bfSetp,             /* in - bitfile set desc ptr */
     bfTagT *tp,                 /* in/out - pointer to tag to look up */
@@ -1476,7 +1476,7 @@ tagdir_lookup(
     bfPageRefHT pgRef;
     bsTDirPgT *tdpgp;
     bsTMapT *tdmap;
-    statusT sts;
+    int sts;
     domainT *domain = bfSetp->dmnP;
 
     if (BS_BFTAG_RSVD(*tp)) {
@@ -1573,7 +1573,7 @@ tagdir_lookup(
  * This is needed to support the semantics of bs_bfs_get_info.
  */
 
-statusT
+int
 tagdir_lookup2(
     bfSetT *bfSetp,             /* in - bitfile set desc ptr */
     bfTagT *tp,                 /* in,out - pointer to tag */
@@ -1581,7 +1581,7 @@ tagdir_lookup2(
     vdIndexT *vdIndex           /* out - virtual disk index */
     )
 {
-    statusT sts;
+    int sts;
 
     sts = tagdir_lookup(bfSetp, tp, bfMCId, vdIndex);
     switch (sts) {
@@ -1612,7 +1612,7 @@ tagdir_lookup2(
  * a consistent view, then it must hold the tagdir freelist semaphore.
  */
 
-statusT
+int
 tagdir_lookup_next(
     bfSetT *bfSetp,             /* in - bitfile set desc pointer */
     bfTagT *tp,                 /* in,out - pointer to tag */
@@ -1733,7 +1733,7 @@ tagdir_lookup_next(
  * the tag directory copy within a transaction.
  */
 
-statusT
+int
 bs_switch_root_tagdir (
                        domainT *dmnP,       /* in */
                        vdIndexT newVdIndex  /* in */
@@ -1759,7 +1759,7 @@ bs_switch_root_tagdir (
     bfPageRefHT pgPin;
     bfPageRefHT pgRef;
     rbfPgRefHT rbfPgPin;
-    statusT sts;
+    int sts;
     ftxHT subFtxH;
     int mcell_index;
     struct bfAccess *mdap;

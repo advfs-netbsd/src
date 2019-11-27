@@ -92,7 +92,7 @@ undo_cre_xtnt_rec (
 void
 x_dealloc_extent_maps(bsInMemXtntT *xtnts);
 
-statusT
+int
 update_xtnt_rec ( 
                  domainT *domain,  /* in */
                  bfTagT bfTag, /* in */
@@ -110,7 +110,7 @@ update_xtnt_array (
                    );
 
 static
-statusT
+int
 load_inmem_xtnt_map (
                      bfAccessT *bfap,           /* in, modified */
                      bsXtntRT *xtntRec,         /* in */
@@ -118,7 +118,7 @@ load_inmem_xtnt_map (
                      );
 
 static
-statusT
+int
 load_from_shadow_rec (
                       bfAccessT *bfap,               /* in, modified */
                       vdIndexT bfVdIndex,            /* in */
@@ -130,7 +130,7 @@ load_from_shadow_rec (
                       );
 
 static
-statusT
+int
 load_from_xtnt_rec (
                     bfAccessT *bfap,           /* in, modified */
                     bsXtntRT *xtntRec,         /* in */
@@ -140,7 +140,7 @@ load_from_xtnt_rec (
                     );
 
 static
-statusT
+int
 load_from_rbmt_xtnt_rec (
                          bfAccessT *bfap,        /* in, modified */
                          bsXtntRT *xtntRec,      /* in */
@@ -148,7 +148,7 @@ load_from_rbmt_xtnt_rec (
                          );
 
 static
-statusT
+int
 load_from_xtra_xtnt_rec (
                          bfAccessT *bfap,                  /* in, modified */
                          vdIndexT vdIndex,                 /* in */
@@ -160,7 +160,7 @@ load_from_xtra_xtnt_rec (
                          );
 
 static
-statusT
+int
 load_from_bmt_xtra_xtnt_rec (
                              domainT *dmnP,  /* in */
                              vdIndexT vdIndex,  /* in */
@@ -173,7 +173,7 @@ load_from_bmt_xtra_xtnt_rec (
                              );
 
 static
-statusT
+int
 load_from_xtnt_array (
                       int cnt,  /* in */
                       bsXtntT *bsXA,  /* in */
@@ -220,7 +220,7 @@ undo_mcell_cnt (
     bsMCT *mcellp;
     rbfPgRefHT pgRef;
     bsShadowXtntT *shadowRec;
-    statusT sts;
+    int sts;
     mcellCntUndoRecT *undoRec;
     bsXtntRT *xtntRec;
     vdT *vdp;
@@ -344,7 +344,7 @@ undo_upd_xtnt_rec (
     bsMCT *mcell;
     rbfPgRefHT pgPin;
     bsShadowXtntT *shadowRec;
-    statusT sts;
+    int sts;
     bsXtntRT *xtntRec;
     bsXtraXtntRT *xtraXtntRec;
     updXtntRecUndoRecT undoRec;
@@ -518,7 +518,7 @@ undo_cre_xtnt_rec (
     domainT *domain;
     bsMCT *mcp;
     rbfPgRefHT pgPin;
-    statusT sts;
+    int sts;
     creXtntRecUndoRecT undoRec;
     vdT *vdp;
     struct bfAccess *mdap;
@@ -579,7 +579,7 @@ undo_cre_xtnt_rec (
 void
 init_bs_xtnts_opx (void)
 {
-    statusT sts;
+    int sts;
 
     sts = ftx_register_agent(
                              FTA_BS_XTNT_UPD_MCELL_CNT_V1,
@@ -661,7 +661,7 @@ init_bs_xtnts_opx (void)
  * This function assumes that the file is not reserved.
  */
 
-statusT
+int
 odm_remove_mcells_from_xtnt_map (
                                  domainT *domain,  /* in */
                                  bfTagT bfTag, /* in */
@@ -670,7 +670,7 @@ odm_remove_mcells_from_xtnt_map (
                                  ftxHT parentFtx  /* in */
                                  )
 {
-    statusT sts;
+    int sts;
     bsInMemSubXtntMapT *subXtntMap;
     
     if (xtntMap->origEnd == xtntMap->origStart) {
@@ -729,7 +729,7 @@ odm_remove_mcells_from_xtnt_map (
  * in-mem extent map cannot change.
  */
 
-statusT
+int
 odm_create_xtnt_map (
                      bfAccessT *bfap,  /* in */
                      bfSetT *bfSetp,  /* in */
@@ -744,7 +744,7 @@ odm_create_xtnt_map (
     uint32T i;
     bfMCIdT mcellId;
     bsInMemSubXtntMapT *nextSubXtntMap;
-    statusT sts;
+    int sts;
     bsInMemSubXtntMapT *subXtntMap;
     vdIndexT vdIndex;
 
@@ -816,7 +816,7 @@ odm_create_xtnt_map (
  * This function creates the extent map header and links the mcells onto it.
  */
 
-statusT
+int
 create_xtnt_map_hdr (
                      bfAccessT *bfap,  /* in */
                      vdIndexT firstVdIndex,  /* in */
@@ -835,7 +835,7 @@ create_xtnt_map_hdr (
     bsInMemSubXtntMapT emptySubXtntMap;
     bfMCIdT primMcellId;
     vdIndexT primVdIndex;
-    statusT sts;
+    int sts;
 
     KASSERT(!BS_BFTAG_RSVD(bfap->tag));  /* not designed for rsvd files */
 
@@ -925,7 +925,7 @@ create_xtnt_map_hdr (
  * new on-disk extent map from the new in-mem extent map.
  */
 
-statusT
+int
 odm_rewrite_xtnt_map (
                       bfAccessT *bfap,   /* in */
                       int xtntMapIndex,  /* in */
@@ -942,7 +942,7 @@ odm_rewrite_xtnt_map (
     bsInMemXtntMapT *newXtntMap = NULL;
     bfMCIdT prevMcellId;
     vdIndexT prevVdIndex;
-    statusT sts;
+    int sts;
     bsInMemSubXtntMapT *subXtntMap;
     vdIndexT vdIndex;
     bsInMemXtntMapT *xtntMap;
@@ -1309,7 +1309,7 @@ HANDLE_EXCEPTION:
  *              mcell on-disk.
  */
 
-statusT
+int
 x_update_ondisk_xtnt_map (
                           domainT *domain,  /* in */
                           bfAccessT *bfap,  /* in */
@@ -1319,7 +1319,7 @@ x_update_ondisk_xtnt_map (
 {
     uint32T i;
     uint32T mcellCnt = 0;
-    statusT sts = EOK;
+    int sts = EOK;
     bsInMemSubXtntMapT *subXtntMap;
     vdIndexT prevVdIndex;
     bfMCIdT prevMcellId;
@@ -1450,7 +1450,7 @@ x_update_ondisk_xtnt_map (
  * to the record.
  */
 
-statusT
+int
 update_xtnt_rec ( 
                  domainT *domain,  /* in */
                  bfTagT bfTag, /* in */
@@ -1468,7 +1468,7 @@ update_xtnt_rec (
     bfMCIdT mcellId;
     rbfPgRefHT pgPin;
     bsShadowXtntT *shadowRec;
-    statusT sts;
+    int sts;
     updXtntRecUndoRecT undoRec;
     int undoRecSize;
     vdT *vd;
@@ -1631,7 +1631,7 @@ update_xtnt_array (
  *  n  - This storage is going to stripe (n-1) in a striped clone
  */
 
-statusT
+int
 odm_create_xtnt_rec (
                      bfAccessT *bfap,  /* in */
                      vdIndexT allocVdIndex,  /* in */
@@ -1647,7 +1647,7 @@ odm_create_xtnt_rec (
     bsMCT *mcell;
     bfMCIdT mcellId;
     rbfPgRefHT pgPin;
-    statusT sts;
+    int sts;
     vdT *vd;
     vdIndexT vdIndex;
     bsXtntRT *xtntRec;
@@ -1841,7 +1841,7 @@ odm_create_xtnt_rec (
  * The caller of this function must own the bitfile's mcell list lock.
  */
 
-statusT
+int
 x_create_shadow_rec (
                      bfAccessT *bfap,  /* in */
                      bsInMemXtntMapT *xtntMap,  /* in */
@@ -1851,7 +1851,7 @@ x_create_shadow_rec (
                      int striping_file /* in - TRUE if activating striping */
                      )
 {
-    statusT sts;
+    int sts;
     bsInMemSubXtntMapT *subXtntMap;
 
     if (BS_BFTAG_RSVD (bfap->tag)) {
@@ -1943,7 +1943,7 @@ x_create_shadow_rec (
  * retfreedMcellId.
  */
 
-statusT
+int
 x_detach_extent_chain (
                        bfAccessT *bfap,       /* in */
                        bsInMemXtntMapT *xtntMap,  /* in */
@@ -1961,7 +1961,7 @@ x_detach_extent_chain (
     bfPageRefHT pgRef;
     bfMCIdT prevMcellId;
     vdIndexT prevVdIndex;
-    statusT sts;
+    int sts;
     vdT *vd;
     bsXtntRT *xtntRec;
     bsXtntT primXtntSave[2], *tempXtntp;
@@ -2128,7 +2128,7 @@ x_detach_extent_chain (
  * This function updates the "mcellCnt" field in an extent record.
  */
 
-statusT
+int
 update_mcell_cnt (
                   domainT *domain,  /* in */
                   bfTagT bfTag, /* in */
@@ -2145,7 +2145,7 @@ update_mcell_cnt (
     uint16T *mcellCntAddr;
     rbfPgRefHT pgPin;
     bsShadowXtntT *shadowRec;
-    statusT sts;
+    int sts;
     mcellCntUndoRecT undoRec;
     vdT *vd;
     bsXtntRT *xtntRec;
@@ -2229,13 +2229,13 @@ update_mcell_cnt (
  * in-memory extent maps.
  */
 
-statusT
+int
 x_create_inmem_xtnt_map (
                          bfAccessT *bfap,  /* in, modified */
                          bsMCT *bfMcellp   /* in */
                          )
 {
-    statusT sts;
+    int sts;
     bsXtntRT *xtntRec;
     vdT *vdp;
     bsInMemXtntT *xtnts = &bfap->xtnts;
@@ -2308,7 +2308,7 @@ HANDLE_EXCEPTION:
  * intend to modify the extent maps.
  */
 
-statusT
+int
 x_load_inmem_xtnt_map (
                        bfAccessT *bfap,      /* in, modified */
                        uint32T lock_request  /* in */
@@ -2318,7 +2318,7 @@ x_load_inmem_xtnt_map (
     int derefFlag = 0;
     bsMCT *mcell;
     bfPageRefHT pgRef;
-    statusT sts;
+    int sts;
     uint32T totalPageCnt;
     unLkActionT unlock_action;
     vdT *vd;
@@ -2484,7 +2484,7 @@ HANDLE_EXCEPTION:
  */
 
 static
-statusT
+int
 load_inmem_xtnt_map (
                      bfAccessT *bfap,          /* in, modified */
                      bsXtntRT *xtntRec,        /* in */
@@ -2498,7 +2498,7 @@ load_inmem_xtnt_map (
     bsInMemXtntMapT *nextXtntMap;
     bsInMemXtntMapT *prevXtntMap;
     int segmentCnt;
-    statusT sts;
+    int sts;
     uint32T totalPageCnt;
     vdIndexT vdIndex;
     bsInMemXtntMapT *xtntMap;
@@ -2635,7 +2635,7 @@ load_inmem_xtnt_map (
  */
 
 static
-statusT
+int
 load_from_shadow_rec (
                       bfAccessT *bfap,              /* in, modified */
                       vdIndexT bfVdIndex,           /* in */
@@ -2656,7 +2656,7 @@ load_from_shadow_rec (
     uint32T pageOffset;
     bfPageRefHT pgRef;
     bsShadowXtntT *shadowRec;
-    statusT sts;
+    int sts;
     bsInMemSubXtntMapT *subXtntMap = NULL;
     uint32T totalPageCnt;
     vdIndexT vdIndex;
@@ -2956,7 +2956,7 @@ HANDLE_EXCEPTION:
  */
 
 static
-statusT
+int
 load_from_xtnt_rec (
                     bfAccessT *bfap,               /* in, modified */
                     bsXtntRT *xtntRec,             /* in */
@@ -2971,7 +2971,7 @@ load_from_xtnt_rec (
     vdIndexT nextVdIndex;
     uint32T pageCnt;
     uint32T pageOffset;
-    statusT sts;
+    int sts;
     bsInMemSubXtntMapT *subXtntMap;
     uint32T totalPageCnt;
     vdIndexT vdIndex;
@@ -3197,7 +3197,7 @@ HANDLE_EXCEPTION:
  */
 
 static
-statusT
+int
 load_from_xtra_xtnt_rec (
                          bfAccessT *bfap,                  /* in, modified */
                          vdIndexT vdIndex,                 /* in */
@@ -3213,7 +3213,7 @@ load_from_xtra_xtnt_rec (
     bsMCT *mcellp;
     bsXtraXtntRT *xtraXtntRec;
     bfPageRefHT pgRef;
-    statusT sts;
+    int sts;
     vdT *vdp;
     struct bfAccess *mdap;
     domainT *dmnP = bfap->dmnP;
@@ -3302,7 +3302,7 @@ HANDLE_EXCEPTION:
  */
 
 static
-statusT
+int
 load_from_bmt_xtra_xtnt_rec (
                              domainT *dmnP,  /* in */
                              vdIndexT vdIndex,  /* in */
@@ -3317,7 +3317,7 @@ load_from_bmt_xtra_xtnt_rec (
     bsMPgT *bmtp;
     bsMPgT *rbmtPg=NULL;
     bsMCT *mcellp;
-    statusT sts;
+    int sts;
     int xtntCnt;
     bsXtraXtntRT *xtraXtntRec;
     vdT *vdp;
@@ -3337,7 +3337,7 @@ load_from_bmt_xtra_xtnt_rec (
     {
         rbmtPg = (struct bsMPg *)ms_malloc_waitok(sizeof(struct bsMPg));
 
-        if (sts = (statusT) read_raw_bmt_page(vdp->devVp, vdBlk, rbmtPg)) 
+        if (sts = (int) read_raw_bmt_page(vdp->devVp, vdBlk, rbmtPg)) 
         {
             RAISE_EXCEPTION (sts);
         }
@@ -3409,7 +3409,7 @@ HANDLE_EXCEPTION:
  */
 
 static
-statusT
+int
 load_from_xtnt_array (
                       int cnt,  /* in */
                       bsXtntT *bsXA,  /* in */
@@ -3418,7 +3418,7 @@ load_from_xtnt_array (
 {
     uint32T inMem;
     uint32T onDisk;
-    statusT sts;
+    int sts;
 
     /*
      * Check to see if cnt > 0.  If it is not, we return ENO_XTNTS so that
@@ -3466,7 +3466,7 @@ load_from_xtnt_array (
  * bitfile.
  */
 
-statusT
+int
 odm_check_xtnt_map (
                     domainT *domain,  /* in */
                     bfTagT bfTag, /* in */
@@ -3486,7 +3486,7 @@ odm_check_xtnt_map (
     bfMCIdT prevMcellId;
     vdIndexT prevVdIndex;
     bsShadowXtntT *shadowRec;
-    statusT sts;
+    int sts;
     vdT *vd;
     vdIndexT vdIndex;
     bsXtntRT *xtntRec;
@@ -3676,7 +3676,7 @@ HANDLE_EXCEPTION:
  * NOTE:  This function assumes a non-striped bitfile.
  */
 
-statusT
+int
 odm_print_xtnt_map (
                     domainT *domain,  /* in */
                     bfTagT bfTag, /* in */
@@ -3696,7 +3696,7 @@ odm_print_xtnt_map (
     bfMCIdT prevMcellId;
     vdIndexT prevVdIndex;
     bsShadowXtntT *shadowRec;
-    statusT sts;
+    int sts;
     vdT *vd;
     vdIndexT vdIndex;
     bsXtntRT *xtntRec;

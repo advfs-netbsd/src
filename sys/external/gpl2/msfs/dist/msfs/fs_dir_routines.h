@@ -43,7 +43,7 @@ fs_init_directory (
                    uint32T advfs_page_size
                    );
 
-statusT
+int
 get_name(
          struct mount *mp,
          bfTagT bf_tag,
@@ -51,7 +51,7 @@ get_name(
          bfTagT *dir_tag
          );
 
-statusT
+int
 get_name2(
          char *name,
          bfTagT bf_tag,
@@ -59,25 +59,25 @@ get_name2(
          bfTagT *parent_tag
          );
 
-statusT
+int
 get_undel_dir(
               char *dir_path,
               bfTagT *undelDirTag
               );
 
-statusT
+int
 attach_undel_dir(
                  char *dir_path,
                  char *undel_dir_path
                  );
 
-statusT
+int
 detach_undel_dir(
                  char *dir_path,
                  long xid
                  );
 
-statusT
+int
 insert_seq(
            struct vnode* dvp,     /* in - directory vnode */
            bfTagT new_bs_tag,      /* in - tag of the new entry */
@@ -89,19 +89,19 @@ insert_seq(
            ftxHT ftx_handle
            );
 
-statusT
+int
 remove_dir_ent(
                struct nameidata *ndp,
                ftxHT ftx_handle
                );
 
-statusT
+int
 remove_dots(
 	    struct vnode *dvp,
 	    ftxHT ftx_handle
 	    );
 
-statusT
+int
 seq_search (
             struct vnode* dir_vp,
             struct nameidata *ndp,
@@ -120,7 +120,7 @@ fs_dir_size_notice(
                    uint offset               /* in - offset in dir's page */
                    );
 
-statusT
+int
 setup_for_glom_dir_entries(
                            char *dir_buffer,
                            fs_dir_entry **start_dir_p,
@@ -149,7 +149,7 @@ dir_trunc_finish(
                  struct vnode *vp  
                 );
 
-statusT
+int
 bf_get(
        bfTagT   bf_tag,     
        struct fsContext *dir_context,
@@ -163,7 +163,7 @@ bf_get(
  *
  * Access a bitfile. Analagous to iget operations in other file systems.
  */
-statusT
+int
 bf_get_l(
          bfTagT   bf_tag,     /* in - tag of bitfile to access */
          struct fsContext *dir_context, /* in - parent dir context pointer */
@@ -182,13 +182,13 @@ fs_assemble_dir (
                  char *new_file_name
                  );
 
-statusT
+int
 fs_create_file(
                struct vattr *vap,
                struct nameidata *ndp
                );
 
-statusT
+int
 fs_update_stats(
                 struct vnode *vp, /* in - vnode of bitfile */
                 struct bfAccess *bfap,  /* in - bitfile's access structure */
@@ -239,7 +239,7 @@ fs_cleanup_thread(void);
 void
 fs_init_cleanup_thread(void);
 
-statusT
+int
 fs_create_file_set(
     bfSetT *bfSetp,
     gid_t quotaId,
@@ -264,7 +264,7 @@ fs_write_add_stg(
 #define WASF_SYNC       0x0004     /* synchronous write */
 #define WASF_NO_ZERO    0x0008     /* no-zero-fill allocation */
 
-statusT
+int
 fs_delete_frag(
     bfSetT *bfSetp,               /* in - file's bfSet pointer */
     struct bfAccess *bfap,        /* in - file's access structure */
@@ -274,7 +274,7 @@ fs_delete_frag(
     ftxHT parentFtxH              /* in - parent transaction */
     );
 
-statusT
+int
 copy_and_del_frag (
                    struct vnode* vp,
                    struct uucred *cred,

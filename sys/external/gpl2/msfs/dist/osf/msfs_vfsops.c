@@ -90,7 +90,7 @@ extern const char  default_rootname[];  /* "root_device" */
 extern       char *bootmpname;
 extern const char  default_bootname[];  /* "local_root"  */
 
-extern vm_offset_t     vm_kern_zero_page;    /* A page full of zeroes      */
+extern vsize_t     vm_kern_zero_page;    /* A page full of zeroes      */
 extern pmap_t          kernel_pmap;          /* pointer to the kernel pmap */
 
 /*
@@ -145,7 +145,7 @@ struct vnode       **GlobalRootVpp;
 int MountWriteDelay = 0;         /* TRUE if we need to delay writes for mount */
 int Advfs_enable_dio_mount = 0;  /* Set to TRUE if mounting of a fileset for
                                   * directIO via "-o directIO" is desired.    */
-vm_offset_t virtualZeroRangeP = NULL; /* wc.advfs.014.Zeronoallocbufpg */
+vsize_t virtualZeroRangeP = NULL; /* wc.advfs.014.Zeronoallocbufpg */
 extern void advfs_range_init(void);
 
 /*
@@ -173,7 +173,7 @@ msfs_mountroot(mp, vpp)
             
             bfAccessT    *root_accessp;
             int           fs_time;
-            statusT       sts;
+            int       sts;
             int           error, count;
             int           now_time;
             bsBfSetAttrT  fsAttr_rec;
@@ -387,7 +387,7 @@ msfs_mount( struct mount *mp,           /* in */
            char       *setName = NULL;
            char       *dmnName = NULL;
            char       *tmp = NULL;
-           statusT     sts;
+           int     sts;
            int         now_time;
            char       *tempstring = NULL;
            int         stopFreezefs = 0;
@@ -891,7 +891,7 @@ cleanup:
         mutex_enter(&dmnP->dmnFreezeMutex);
         dmnP->dmnFreezeRefCnt--;
         if ( dmnP->dmnFreezeWaiting && dmnP->dmnFreezeRefCnt == 0) {
-            thread_wakeup( (vm_offset_t)&dmnP->dmnFreezeWaiting );
+            thread_wakeup( (vsize_t)&dmnP->dmnFreezeWaiting );
         }
         mutex_exit(&dmnP->dmnFreezeMutex);
     }
@@ -930,7 +930,7 @@ advfs_mountfs(struct mount *mp)
     struct undel_dir_rec undel_rec;
     quotaInfoT *qip;
     int error;
-    statusT sts;
+    int sts;
     bfSetT *setp = NULL;
     bsrRsvd17T bsrRsvd17;
     u_long flag = mp->m_flag & ADVFS_MOUNT_FLAGS;
@@ -1313,14 +1313,14 @@ advfs_mountfs(struct mount *mp)
             /* Only one thread can be waiting on bfsOpWait. */
             KASSERT(setp->bfsOpWait == 0);
             setp->bfsOpWait = 1;
-            thread_sleep( (vm_offset_t)&setp->bfsHoldCnt,
+            thread_sleep( (vsize_t)&setp->bfsHoldCnt,
                           &setp->dmnP->mutex.mutex, FALSE );
             mutex_enter( &setp->dmnP->mutex );
         }
 
         setp->bfsOpPend = 0;
         if ( setp->bfsHoldWait > 0 ) {
-            thread_wakeup( (vm_offset_t)&setp->bfsHoldWait );
+            thread_wakeup( (vsize_t)&setp->bfsHoldWait );
         }
 
     }
@@ -1756,7 +1756,7 @@ msfs_unmount(
 {
     struct fileSetNode *fsnp, *fsp;
     int error = 0;
-    statusT sts;
+    int sts;
     bfSetT *setp;
     struct fsContext *dir_context_pointer;
     quotaInfoT *qip;
@@ -1934,7 +1934,7 @@ msfs_unmount(
         mutex_enter(&dmnP->dmnFreezeMutex);
         dmnP->dmnFreezeRefCnt--;
         if ( dmnP->dmnFreezeWaiting && dmnP->dmnFreezeRefCnt == 0) {
-            thread_wakeup( (vm_offset_t)&dmnP->dmnFreezeWaiting );
+            thread_wakeup( (vsize_t)&dmnP->dmnFreezeWaiting );
         }
         mutex_exit(&dmnP->dmnFreezeMutex);
     }
@@ -2004,7 +2004,7 @@ cleanup:
         mutex_enter(&dmnP->dmnFreezeMutex);
         dmnP->dmnFreezeRefCnt--;
         if ( dmnP->dmnFreezeWaiting && dmnP->dmnFreezeRefCnt == 0) {
-            thread_wakeup( (vm_offset_t)&dmnP->dmnFreezeWaiting );
+            thread_wakeup( (vsize_t)&dmnP->dmnFreezeWaiting );
         }
         mutex_exit(&dmnP->dmnFreezeMutex);
     }
@@ -2435,7 +2435,7 @@ msfs_sync(
         dmnP->dmnFreezeRefCnt--;
 
         if ( dmnP->dmnFreezeWaiting && dmnP->dmnFreezeRefCnt == 0) {
-            thread_wakeup( (vm_offset_t)&dmnP->dmnFreezeWaiting );
+            thread_wakeup( (vsize_t)&dmnP->dmnFreezeWaiting );
         }
         mutex_exit(&dmnP->dmnFreezeMutex);
     }
@@ -2697,7 +2697,7 @@ msfs_sync_todr(
     int now_time;
     extern int advfs_shutting_down;             /* global in machdep.c */
     bfAccessT *root_accessp;
-    statusT sts = EOK;
+    int sts = EOK;
     struct mount *pmp;
 
     if (clu_is_ready()) {
@@ -2746,7 +2746,7 @@ msfs_fhtovp(
             )
 {
     struct vnode *found_vp = NULL;
-    statusT ret;
+    int ret;
     register struct msfs_fid *i_fid;
     int flag = DONT_UNLOCK|IGNORE_DELETE;
 
@@ -2837,7 +2837,7 @@ advfs_range_init(void)
 {
 
     int         pg;
-    vm_offset_t phys;
+    vsize_t phys;
 
     /*
      *  Set up an AdvFS virtual memory address range.  This will be used
@@ -2994,7 +2994,7 @@ msfs_mntflushbuf(
  * disk with the new file set device identifier.
  *
  */
-static statusT
+static int
 chk_set_fsdev (
     struct mount *mp,  /* In: mount point to perform fsdev update. */
     int fsId,          /* In: fsdev to use. Set to 0 if check_flag false.*/
@@ -3002,7 +3002,7 @@ chk_set_fsdev (
                        /*     FALSE, just update the fsdev to disk. */
     )
 {
-    statusT sts;
+    int sts;
     bsBfSetAttrT fsAttr_rec;
     bfSetT *bfSetp;
     ftxHT ftxH;
@@ -3419,7 +3419,7 @@ u_int smsync_flag;             /* perform non-smooth'ed operations */
     mutex_enter(&dmnP->dmnFreezeMutex);
     dmnP->dmnFreezeRefCnt--;
     if ( dmnP->dmnFreezeWaiting && dmnP->dmnFreezeRefCnt == 0) {
-        thread_wakeup( (vm_offset_t)&dmnP->dmnFreezeWaiting );
+        thread_wakeup( (vsize_t)&dmnP->dmnFreezeWaiting );
     }
     mutex_exit(&dmnP->dmnFreezeMutex);
 
@@ -3507,8 +3507,8 @@ advfs_freezefs ( struct mount *mp,
     mutex_enter(&AdvfsFreezeMsgsLock);
     msg->frzmLink = AdvfsFreezeMsgs;
     AdvfsFreezeMsgs = msg;
-    assert_wait_mesg( (vm_offset_t) &msg->frzmStatus, FALSE, "advfs_freeze_vfsop" );
-    thread_wakeup( (vm_offset_t) &AdvfsFreezeMsgs );
+    assert_wait_mesg( (vsize_t) &msg->frzmStatus, FALSE, "advfs_freeze_vfsop" );
+    thread_wakeup( (vsize_t) &AdvfsFreezeMsgs );
     mutex_exit(&AdvfsFreezeMsgsLock);
     thread_block();
     error = msg->frzmStatus;

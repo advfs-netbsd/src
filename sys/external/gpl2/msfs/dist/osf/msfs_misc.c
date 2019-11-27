@@ -69,7 +69,7 @@ spec_page_write(void)
 }
 
 static
-statusT
+int
 copy_frag_into_page (
                      bfAccessT *fragBfAccessp,  /* in */
                      bfFragIdT fragId,  /* in */
@@ -287,7 +287,7 @@ vnode_fscontext_deallocate(
  *
  * Access a bitfile. Analagous to iget operations in other file systems.
  */
-statusT
+int
 bf_get(
        bfTagT   bf_tag,     /* in - tag of bitfile to access */
        struct fsContext *dir_context, /* in - parent dir context pointer */
@@ -332,7 +332,7 @@ unsigned long Bf_get_restored_stats = 0;
  * Note that the dir_context lock is ALWAYS released in this routine unless
  * the DONT_UNLOCK flag is passed.
  */
-statusT
+int
 bf_get_l(
          bfTagT   bf_tag,      /* in - tag of bitfile to access */
          struct fsContext *dir_context, /* in - parent dir context pointer */
@@ -348,7 +348,7 @@ bf_get_l(
     struct fsContext *file_context;
     bfAccessT *bfap;
     struct uvm_object *obj;
-    statusT sts=EOK;
+    int sts=EOK;
     struct undel_dir_rec undel_rec;
     uint32T options;
     extern struct vnodeops spec_bfnodeops;
@@ -783,7 +783,7 @@ finish_setup:
             }
 
             if (error = specalloc( nvp, file_context->dir_stats.advfs_st_rdev )) {
-                RAISE_EXCEPTION((statusT) error);
+                RAISE_EXCEPTION((int) error);
             }
 
             nvp->v_op = &spec_bfnodeops;
@@ -1295,7 +1295,7 @@ msfs_reclaim(
 int
 copy_frag_into_vm_page(
                        struct uvm_object* vop,
-                       vm_offset_t offset,  /* in */
+                       vsize_t offset,  /* in */
                        bfAccessT  *fragBfAccessp,  /* in */
                        bfFragIdT fragId,  /* in */
                        uint32T bytesPerFilePage,  /* in */
@@ -1307,9 +1307,9 @@ copy_frag_into_vm_page(
     uint32T copyByteCnt;
     uint32T copyByteOffset;
     uint32T fragByteCnt;
-    vm_offset_t kernelAddr;
+    vsize_t kernelAddr;
     uint32T relativePageOffset;
-    statusT sts;
+    int sts;
 
     kernelAddr = ubc_load (pp, 0, PAGE_SIZE);
 
@@ -1460,8 +1460,8 @@ msfs_putpage(
     bfPageRefHT page_ref;
     void *page_addr;
     int page;
-    vm_offset_t start, offset;
-    statusT res;
+    vsize_t start, offset;
+    int res;
     int i;
     int pushCnt = 0;
     int error = 0;
@@ -1536,8 +1536,8 @@ msfs_putpage(
          */
         if( !(flags & B_ASYNC) || (flags & B_FREE) ) {
             res = bfflush(bfap,
-                          ((vm_offset_t)pl) / ADVFS_PGSZ,
-                          (vm_size_t)pcnt,
+                          ((vsize_t)pl) / ADVFS_PGSZ,
+                          (vsize_t)pcnt,
                           FLUSH_INTERMEDIATE);
             if( res != EOK ) {
                 error = EIO;
@@ -1578,7 +1578,7 @@ msfs_putpage(
          * start is offset at start of bf page.
          */
         page = pp->pg_offset / ADVFS_PGSZ;
-        start = (vm_offset_t) page * ADVFS_PGSZ;
+        start = (vsize_t) page * ADVFS_PGSZ;
 
         /* 
          * Grab all the vm pages that are dirty and can fit into one I/O.
@@ -1600,7 +1600,7 @@ msfs_putpage(
             klusterPages = WRMAXIO / ADVFS_PGSZ_IN_BLKS;
         }
         plp = ubc_dirty_kluster(vop, pp, start, 
-                                (vm_size_t)ADVFS_PGSZ * klusterPages,
+                                (vsize_t)ADVFS_PGSZ * klusterPages,
                                 flags, FALSE, &plcnt);
 
         /* 
@@ -1636,8 +1636,8 @@ msfs_putpage(
 int
 msfs_getpage(
     struct uvm_object* vop,
-    vm_offset_t offset,
-    vm_size_t len,
+    vsize_t offset,
+    vsize_t len,
     vm_prot_t *protp,
     struct vm_page **pl,
     int plsz,
@@ -1898,7 +1898,7 @@ _error:
  */
 
 int
-msfs_fs_cleanup(vm_offset_t opfs) /*In:Copy of vm_page's fs private field.*/
+msfs_fs_cleanup(vsize_t opfs) /*In:Copy of vm_page's fs private field.*/
 {
      struct bsBuf *bp;
 
@@ -2015,7 +2015,7 @@ msfs_write_check(struct uvm_object* vop, struct vm_page *pp)
  */
 
 static
-statusT
+int
 copy_frag_into_page (
                      bfAccessT *fragBfAccessp,  /* in */
                      bfFragIdT fragId,  /* in */
@@ -2026,7 +2026,7 @@ copy_frag_into_page (
                      )
 {
     uint32T fragByteCnt;
-    statusT sts;
+    int sts;
     uint32T subFrag1ByteCnt;
     uint32T subFrag1ByteOffset;
     char *subFrag1Page = NULL;
@@ -2152,10 +2152,10 @@ HANDLE_EXCEPTION:
  */
 
 msfs_mmap( register struct vnode *vp,
-    vm_offset_t offset,
+    vsize_t offset,
     vm_map_t map,
-    vm_offset_t *addrp,
-    vm_size_t len,
+    vsize_t *addrp,
+    vsize_t len,
     vm_prot_t prot,
     vm_prot_t maxprot,
     int flags,
@@ -2168,7 +2168,7 @@ msfs_mmap( register struct vnode *vp,
     struct fsContext *contextp;
     bfAccessT *bfap;
     int locked;
-    statusT sts;
+    int sts;
 
     FILESETSTAT( vp, msfs_mmap );
 
@@ -2267,7 +2267,7 @@ restart:
         FS_FILE_UNLOCK(contextp);
         locked = FALSE;
 
-        ret = u_vp_create( map, vp->v_object, (vm_offset_t) ap );
+        ret = u_vp_create( map, vp->v_object, (vsize_t) ap );
 
         /*
          * Relock the file lock to protect bfap->dataSafety.

@@ -150,7 +150,7 @@ ftxAgentT FtxAgents [FTX_MAX_AGENTS];
 /* TODO: temp ******/
 
 
-statusT
+int
 ftx_register_agent(ftxAgentIdT agentId, /* in - agent id */
                    opxT *undoOpX,   /* in - undo opx routine ptr */
                    opxT *rootDnOpX  /* in - root done opx routine ptr */
@@ -161,7 +161,7 @@ ftx_register_agent(ftxAgentIdT agentId, /* in - agent id */
 }
 
 
-statusT
+int
 ftx_register_agent_n(ftxAgentIdT agentId, /* in - agent id */
                      opxT *undoOpX,       /* in - undo opx proc ptr */
                      opxT *rootDnOpX,     /* in - root done opx proc ptr */
@@ -174,7 +174,7 @@ ftx_register_agent_n(ftxAgentIdT agentId, /* in - agent id */
 }
 
 
-statusT
+int
 ftx_register_agent_n2(ftxAgentIdT agentId, /* in - agent id */
                       opxT *undoOpX,       /* in - undo opx proc ptr */
                       opxT *rootDnOpX,     /* in - root done opx proc ptr */
@@ -231,7 +231,7 @@ kmutex_t FtxMutex;         /* protects ftx tables & FtxDynAlloc */
  */
 struct ftx_dyn_alloc FtxDynAlloc;
 
-statusT
+int
 _ftx_start_i(
       ftxHT *ftxH,              /* out - ftx handle */
       ftxHT parentFtxH,         /* in - parent ftx handle */
@@ -246,7 +246,7 @@ _ftx_start_i(
     ftxStateT* ftxp;
     unsigned int lvl;
     perlvlT* clvlp;
-    statusT sts;
+    int sts;
     ftxHT retFtxH;
     ftxTblDT* ftxTDp;
     int trimwait = 0;
@@ -691,7 +691,7 @@ newftx(void)
 
 /******** TODO: temp ********/
 
-statusT
+int
 ftx_done(
          ftxHT ftxH,            /* in - leaf ftx handle */
          ftxAgentIdT agentId,   /* in - opx agent id */
@@ -793,7 +793,7 @@ ftx_done_urdr(
 {
     unsigned int ftxSlot;
     ftxStateT* ftxp;
-    statusT sts;
+    int sts;
     domainT* dmnP = ftxH.dmnP;
     ftxTblDT* ftxTDp;
     unsigned int lvl;
@@ -895,7 +895,7 @@ ftx_done_urdr(
          * with this ftx and unpin pages pinned during the ftx.
          */
 
-        /* log_donerec_nunpin() now returns statusT instead of void.
+        /* log_donerec_nunpin() now returns int instead of void.
          * This if statement is a place holder for the handling of that
          * return value.
          */
@@ -957,7 +957,7 @@ ftx_done_urdr(
      * with this ftx and unpin pages pinned during the ftx.
      */
 
-    /* log_donerec_nunpin() now returns statusT instead of void.
+    /* log_donerec_nunpin() now returns int instead of void.
      * This if statement is a place holder for the handling of that
      * return value.
      */
@@ -1042,7 +1042,7 @@ ftx_done_urdr(
              * Log the root done redo record.
              */
 
-            /* log_donerec_nunpin() now returns statusT instead of void.
+            /* log_donerec_nunpin() now returns int instead of void.
              * This if statement is a place holder for the handling of that
              * return value.
              */
@@ -1093,7 +1093,7 @@ ftx_quit(
 {
     unsigned int ftxSlot;
     ftxStateT* ftxp;
-    statusT sts;
+    int sts;
     domainT* dmnP = ftxH.dmnP;
     ftxTblDT* ftxTDp;
     unsigned int lvl;
@@ -1200,7 +1200,7 @@ ftx_fail_2(
     uint32T* lgrrecp = 0;
     unsigned int ftxSlot;
     ftxStateT* ftxp;
-    statusT sts, lrsts=EOK;
+    int sts, lrsts=EOK;
     domainT* dmnP = NULL;
     ftxTblDT* ftxTDp;
     int lvl,pli;
@@ -1520,7 +1520,7 @@ ftx_fail_2(
              * failures once the logging of this undo occurs.
              */
 
-            /* log_donerec_nunpin() now returns statusT instead of void.
+            /* log_donerec_nunpin() now returns int instead of void.
              * This if statement is a place holder for the handling of that
              * return value.
              */
@@ -1583,7 +1583,7 @@ ftx_fail_2(
 
         ftxp->undoBackLink = logEndOfRecords;
 
-        /* log_donerec_nunpin() now returns statusT instead of void.
+        /* log_donerec_nunpin() now returns int instead of void.
          * This if statement is a place holder for the handling of that
          * return value.
          */
@@ -1739,7 +1739,7 @@ ftx_special_done_mode(
  * handle than bs_pinpg.
  */
 
-statusT
+int
 rbf_pinpg(
           rbfPgRefHT *pinPgH,     /* out */
           void **bfPageAddr,      /* out */
@@ -1753,7 +1753,7 @@ rbf_pinpg(
     unsigned int ftxSlot;
     domainT* dmnP = ftxH.dmnP;
     ftxTblDT* ftxTDp;
-    statusT sts;
+    int sts;
     int ftxPinS,plpinS;
     void* pgAddr;
     rbfPgRefHT retppH;
@@ -2381,7 +2381,7 @@ addone_recredo(
  * dirty pages associated with it.
  */
 
-statusT
+int
 log_donerec_nunpin(
                    ftxStateT* ftxp,     /* in/out - ftx state */
                    domainT* dmnP,       /* in - domain state */
@@ -2391,7 +2391,7 @@ log_donerec_nunpin(
     perlvlT* clvlp = &ftxp->cLvl[ftxp->currLvl];
     ftxDoneModeT donemode;
     logWriteModeT lwmode;
-    statusT sts = EOK;
+    int sts = EOK;
     int pli,reci;
 
     donemode = clvlp->donemode;
@@ -2512,7 +2512,7 @@ do_ftx_continuations(
     ftxTblDT* ftxTDp = &dmnP->ftxTbld;
     opxT* opxp;
     int wait = 0;
-    statusT sts=0;
+    int sts=0;
 
     if ( !(opxp = FtxAgents[ftxp->contDesc.agentId].contOpX) ) {
         ADVFS_SAD0("do_ftx_continuations: no cont opx");
@@ -2576,7 +2576,7 @@ do_ftx_continuations(
          * Log the root done redo record.
          */
 
-        /* log_donerec_nunpin() now returns statusT instead of void.
+        /* log_donerec_nunpin() now returns int instead of void.
          * This if statement is a place holder for the handling of that
          * return value.
          */

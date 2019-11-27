@@ -73,7 +73,7 @@ get_sub_xtnt_map_alloc_page_cnt (
                                  );
 
 static
-statusT
+int
 merge_adjacent_xtnt_maps (
                           bsInMemXtntMapT *src1XtntMap,  /* in */
                           bsInMemXtntMapT *src2XtntMap,  /* in */
@@ -81,7 +81,7 @@ merge_adjacent_xtnt_maps (
                           );
 
 static
-statusT
+int
 merge_nearby_xtnt_maps (
                         bsInMemXtntMapT *src1XtntMap,  /* in */
                         bsInMemXtntMapT *src2XtntMap,  /* in */
@@ -89,7 +89,7 @@ merge_nearby_xtnt_maps (
                         );
 
 static
-statusT
+int
 merge_intersect_xtnt_maps (
                            uint32T pageSize,  /* in */
                            bsInMemXtntMapT *src1XtntMap,  /* in */
@@ -139,7 +139,7 @@ extern int CheckXtnts;
  *
  * This function creates and initializes an in-memory extent map.
  */
-statusT
+int
 imm_create_xtnt_map (
                      uint32T blksPerPage,  /* in */
                      domainT *domain,  /* in */
@@ -149,7 +149,7 @@ imm_create_xtnt_map (
                      bsInMemXtntMapT **newXtntMap  /* out */
                      )
 {
-    statusT sts;
+    int sts;
     bsInMemXtntMapT *xtntMap;
 
     xtntMap = (bsInMemXtntMapT *) ms_malloc (sizeof (bsInMemXtntMapT));
@@ -178,7 +178,7 @@ imm_create_xtnt_map (
  * map array, if any, and allocates a new array.  If "maxCnt" is 0, it creates
  * an array having a default number of entries.
  */
-statusT
+int
 imm_init_xtnt_map (
                    bsInMemXtntMapT *xtntMap,  /* in */
                    uint32T blksPerPage,  /* in */
@@ -236,7 +236,7 @@ imm_init_xtnt_map (
  * This function extends the in-memory extent map by extending the sub
  * extent map array.
  */
-statusT
+int
 imm_extend_xtnt_map (
                      bsInMemXtntMapT *xtntMap
                      )
@@ -277,7 +277,7 @@ imm_extend_xtnt_map (
 ** So we need to allocate 64K more subextents.
 ** We may be back later to allocate 64K more.
 */
-statusT
+int
 imm_big_extend_xtnt_map( bsInMemXtntMapT *xtntMap )
 {
     uint32T i;
@@ -387,7 +387,7 @@ imm_get_xtnt_desc (
 {
     bsInMemSubXtntMapT *subXtntMap;
     uint32T subXtntMapIndex;
-    statusT sts;
+    int sts;
     uint32T xtntDescIndex;
 
     sts = imm_page_to_sub_xtnt_map( pageOffset,
@@ -560,7 +560,7 @@ imm_delete_sub_xtnt_maps (
  * descriptor array, if any, and allocates a new descriptor array.
  * If "maxCnt" is 0, it creates an array having a default number of entries.
  */
-statusT
+int
 imm_init_sub_xtnt_map (
                        bsInMemSubXtntMapT *subXtntMap,  /* in */
                        uint32T pageOffset,  /* in */
@@ -646,7 +646,7 @@ imm_init_sub_xtnt_map (
  *
  * This function makes a copy of the specified in-memory sub extent map.
  */
-statusT
+int
 imm_copy_sub_xtnt_map (
                        bfAccessT *bfap,                     /* in */
                        bsInMemXtntMapT *xtntMap,            /* in */
@@ -655,7 +655,7 @@ imm_copy_sub_xtnt_map (
                        )
 {
     uint32T i;
-    statusT sts;
+    int sts;
 
     if (oldSubXtntMap->bsXA == NULL) {
         sts = imm_load_sub_xtnt_map( bfap, xtntMap, oldSubXtntMap);
@@ -694,7 +694,7 @@ imm_copy_sub_xtnt_map (
  * This function extends the in-memory sub extent map by extending the
  * extent array.
  */
-statusT
+int
 imm_extend_sub_xtnt_map (
                          bsInMemSubXtntMapT *subXtntMap  /* in */
                          )
@@ -751,7 +751,7 @@ imm_extend_sub_xtnt_map (
  * This function loads the sub extent map's extent descriptor array
  * into the cache from its corresponding on-disk record.
  */
-statusT
+int
 imm_load_sub_xtnt_map (
                        bfAccessT *bfap,                  /* in */
                        bsInMemXtntMapT *xtntMap,         /* in */
@@ -767,7 +767,7 @@ imm_load_sub_xtnt_map (
     bfMCIdT mcellId;
     bfPageRefHT pgRef;
     bsShadowXtntT *shadowRec;
-    statusT sts;
+    int sts;
     vdT *vd;
     vdIndexT vdIndex;
     bsXtntRT *xtntRec;
@@ -928,7 +928,7 @@ imm_unload_sub_xtnt_map (
  *
  * The copy count does not include the termination extent descriptor.
  */
-statusT
+int
 imm_copy_xtnt_descs (
                      vdIndexT copyVdIndex,  /* in */
                      bsXtntT *copyBsXA,  /* in */
@@ -944,7 +944,7 @@ imm_copy_xtnt_descs (
     int needCnt;
     bsInMemSubXtntMapT *newSubXtntMap;
     uint32T src;
-    statusT sts;
+    int sts;
     bsInMemSubXtntMapT *subXtntMap;
     uint32T newtype,
             newmax;
@@ -1198,7 +1198,7 @@ imm_split_desc (
  * This function calculates the number of allocated pages described by
  * the extent map's sub extent maps.
  */
-statusT
+int
 imm_get_alloc_page_cnt (
                         bsInMemXtntMapT *xtntMap,  /* in */
                         uint32T bfPageOffset,  /* in */
@@ -1214,7 +1214,7 @@ imm_get_alloc_page_cnt (
     uint32T i;
     uint32T mapEnd;
     uint32T mapStart;
-    statusT sts;
+    int sts;
     bsInMemSubXtntMapT *subXtntMap;
     uint32T totalCnt = 0;
 
@@ -1543,7 +1543,7 @@ imm_get_hole_size (
     uint32T nextSegBfPageOffset;
     uint32T segmentCnt;
     uint32T segmentSize;
-    statusT sts;
+    int sts;
     uint32T subMapIndex;
     bsInMemSubXtntMapT *subXtntMap;
     uint32T xmPageOffset;
@@ -1715,7 +1715,7 @@ imm_get_hole_size (
  *
  * This function returns the type of the specified page.
  */
-statusT
+int
 imm_get_page_type (
                    bsInMemXtntT *xtnts,  /* in */
                    uint32T pageOffset  /* in */
@@ -1723,7 +1723,7 @@ imm_get_page_type (
 {
     uint32T descIndex;
     uint32T mapIndex;
-    statusT sts;
+    int sts;
     uint32T xmPageOffset;
     bsInMemXtntMapT *xtntMap;
 
@@ -1812,7 +1812,7 @@ imm_set_next_valid_copy_page (
  * the preceeding sub extent map's index.
  * If updateFlg is set this function only looks in the update subextents.
  */
-statusT
+int
 imm_page_to_sub_xtnt_map (
                           uint32T pageOffset,  /* in */
                           bsInMemXtntMapT *xtntMap,  /* in */
@@ -1824,7 +1824,7 @@ imm_page_to_sub_xtnt_map (
     int mid;
     int upr;
     int last;
-    statusT sts;
+    int sts;
 
     KASSERT(xtntMap->validCnt <= xtntMap->cnt);
     KASSERT(xtntMap->cnt <= xtntMap->maxCnt);
@@ -1902,7 +1902,7 @@ imm_page_to_sub_xtnt_map (
  * If the permHoleFlg flag is set, then pages that fall within a
  * permanent hole return EOK, not E_PAGE_HOLE.
  */
-statusT
+int
 imm_page_to_xtnt (
                   uint32T pageOffset,  /* in */
                   bsInMemSubXtntMapT *subXtntMap,  /* in */
@@ -1913,7 +1913,7 @@ imm_page_to_xtnt (
 {
     uint32T lwr;
     uint32T mid;
-    statusT sts;
+    int sts;
     uint32T upr;
 
     if (subXtntMap->cnt == 0) {
@@ -2079,7 +2079,7 @@ imm_page_to_xtnt (
 **      |   C   |                     |y|  B  |
 */
 
-statusT
+int
 overlay_xtnt_map ( bfAccessT *bfap,
                    uint32T stripeIndex,  /* in */
                    bsInMemXtntMapT *baseXtntMap,  /* in */
@@ -2088,7 +2088,7 @@ overlay_xtnt_map ( bfAccessT *bfap,
                    bsInMemXtntMapT **retReplXtntMap,  /* out */
                    ftxHT ftxH)
 {
-    statusT sts;
+    int sts;
     bsInMemXtntMapT *modXtntMap = NULL;
     bsInMemXtntMapT *replXtntMap = NULL;
     bsXtntT part1BsXA;
@@ -3739,7 +3739,7 @@ HANDLE_EXCEPTION:
  *
  * The caller must have exclusive access to the overlay and base extent maps.
  */
-statusT
+int
 imm_overlay_xtnt_map (
                       bsInMemXtntMapT *baseXtntMap,  /* in */
                       bsInMemXtntMapT *overXtntMap,  /* in */
@@ -3759,7 +3759,7 @@ imm_overlay_xtnt_map (
     bsXtntT part1BsXA;
     bsXtntT part2BsXA;
     bsInMemXtntMapT *replXtntMap = NULL;
-    statusT sts;
+    int sts;
     vdIndexT vdIndex;
     uint32T newtype,
             newmax;
@@ -4178,7 +4178,7 @@ HANDLE_EXCEPTION:
  *             or
  *      clean up any more overlays
  */
-statusT
+int
 imm_merge_xtnt_map (
                     bfAccessT *bfap,                  /* in */
                     bsInMemXtntMapT *baseXtntMap,     /* in */
@@ -4197,7 +4197,7 @@ imm_merge_xtnt_map (
     bsInMemXtntDescIdT overDescId;
     bsXtntT part1BsXA;
     bsXtntT part2BsXA;
-    statusT sts;
+    int sts;
     vdIndexT vdIndex;
     bsXtntMapTypeT bsXtntMapType = bfap->xtnts.type;
     bsInMemSubXtntMapT *sxmP;
@@ -4530,14 +4530,14 @@ HANDLE_EXCEPTION:
  * This function creates an extent map and copies the entries from the source
  * map into it.
  */
-statusT
+int
 imm_copy_xtnt_map (
                    bfAccessT *bfap,              /* in */
                    bsInMemXtntMapT *srcXtntMap,  /* in */
                    bsInMemXtntMapT **dstXtntMap  /* out */
                    )
 {
-    statusT sts;
+    int sts;
     bsInMemXtntMapT *xtntMap = NULL;
     int i, cnt=0;
 
@@ -4610,7 +4610,7 @@ HANDLE_EXCEPTION:
  * map's "origStart" and "origEnd" fields to denote which original
  * sub extent maps contain the to-be-removed mappings.
  */
-statusT
+int
 imm_remove_page_map (
                      uint32T bfPageOffset,  /* in */
                      uint32T bfPageCnt,  /* in */
@@ -4629,7 +4629,7 @@ imm_remove_page_map (
     uint32T lastPageOffset;
     uint32T pageOffset;
     uint32T stickyHole=FALSE;
-    statusT sts;
+    int sts;
     bsInMemSubXtntMapT *subXtntMap;
     lbnT blk;
 
@@ -5136,7 +5136,7 @@ HANDLE_EXCEPTION:
  * NOTE:  This function assumes a normal bitfile, not a striped or a reserved
  * bitfile.
  */
-statusT
+int
 imm_get_xtnt_map_size (
                        bsInMemXtntMapT *xtntMap,  /* in */
                        int *size /* out */
@@ -5299,7 +5299,7 @@ advfs_get_extent_map (
                       struct extentmap  *map            /* in/out */
                       )
 {
-    statusT  sts;
+    int  sts;
     uint32T pg=0;
     uint32T nextPage=0;
     uint32T clone_nextPage=0;
