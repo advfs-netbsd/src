@@ -334,8 +334,8 @@ cleanup_closed_list(clupClosedListTypeT clean_type)
     struct fsContext* contextp;
     lkStatesT state;
     int   ret;
-    unsigned long css;
-    unsigned long cic;
+//    unsigned long css; // UNUSED
+//    unsigned long cic; // UNUSED
     int pass_2 = 0;
     struct vnode *vp;
     unsigned int cleanup_retry_stats_only = 0;
@@ -360,8 +360,8 @@ cleanup_closed_list(clupClosedListTypeT clean_type)
     cleanup_thread_calls++;
 
 _retry:
-    css = cleanup_structs_skipped;
-    cic = cleanup_invalid_cnt;
+//    css = cleanup_structs_skipped;
+//    cic = cleanup_invalid_cnt;
 
     bfap = ClosedAcc.freeFwd;
     while (bfap != (bfAccessT *)(&ClosedAcc)) {
@@ -876,6 +876,10 @@ restart:
     }  /* End of WHILE loop */
 
     mutex_exit(&bfSetp->accessChainLock);
+
+    if (ret) {
+        printf("fs_flush_saved_stats Failed!");
+    }
 
     return;
 }
