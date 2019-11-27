@@ -36,6 +36,7 @@
 #include <sys/syslog.h>
 #include <sys/time.h>
 #include <sys/vnode.h>
+#include <sys/proc.h>
 
 #include "../msfs/ms_public.h"
 #include "../msfs/ms_privates.h"
@@ -5143,7 +5144,7 @@ startover:
      */
     if (skipped_buffers)
     {
-        assert_wait_mesg_timo(NULL, FALSE, "skipped_buffers", 1);
+        kpause("skipped_buffers", false, 1, NULL);
         thread_block();
         /* Never do cpu time limit check when real time preempt is on. */
         if (!rt_preempt_enabled) {
