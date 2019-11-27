@@ -553,4 +553,9 @@ void RM_ACC_LIST_NOLOCK( bfAccessT *bfap );
  */
 void RM_ACC_LIST_COND( bfAccessT *bfap );
 
+
+/*
+ * Deallocate an access structure.
+ */
+void bs_dealloc_access(bfAccessT *bfap);
 #endif /* _ACCESS_H_ */

@@ -73,7 +73,6 @@ typedef struct timeval bsIdT;           /* unique identifier, 64 bits */
 /***************** end of base "on disk" typedefs ********************/
 
 typedef uint16T vdIndexT;
-typedef int int;        /* tmp */
 
 #define BS_DOMAIN_NAME_SZ     (NAME_MAX + 1)
 #define BS_SET_NAME_SZ        32
