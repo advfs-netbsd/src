@@ -165,4 +165,6 @@ create_xtnt_map_hdr (
                      bfMCIdT *bfMcellId  /* out */
                      );
 
+void x_dealloc_extent_maps(bsInMemXtntT *xtnts);
+
 #endif  /* _BS_EXTENTS_H_ */
