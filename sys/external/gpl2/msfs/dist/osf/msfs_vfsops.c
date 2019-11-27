@@ -73,6 +73,7 @@
 #include "../msfs/bs_params.h"
 #include "../msfs/bs_freeze.h"
 #include "../msfs/bs_domain.h"
+#include "../msfs/bs_bitfile_sets.h"
 
 #define ADVFS_MODULE     MSFS_VFSOPS
 #define BOGUS_ROOTNAME  "generic#root"

@@ -517,5 +517,7 @@ int get_clu_clone_locks( bfAccessT*, struct fsContext*, bfSetT**, bfAccessT** );
 
 void release_clu_clone_locks( bfAccessT*, bfSetT*, bfAccessT*, int );
 
+void bfs_flush_dirty_stats(bfSetT *bfSetp, ftxHT ftxH);
+
 #endif /* _KERNEL */
 #endif /* _BS_BITFILE_SETS_ */

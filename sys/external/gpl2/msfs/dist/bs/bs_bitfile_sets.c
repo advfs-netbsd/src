@@ -55,6 +55,7 @@
 #include "../msfs/bs_stripe.h"
 #include "../msfs/bs_extents.h"
 #include "../msfs/bs_msg_queue.h"
+#include "../msfs/bs_bitfile_sets.h"
 
 #define ADVFS_MODULE BS_BITFILE_SETS
 

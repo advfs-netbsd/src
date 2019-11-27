@@ -3904,7 +3904,7 @@ HANDLE_EXCEPTION:
  * given in-memory extent map.
  */
 void
-x_dealloc_extent_maps(bsInMemXtntT *xtnts) 
+x_dealloc_extent_maps(bsInMemXtntT *xtnts)
 {
     bsInMemXtntMapT       *xtntMap,
                           *nextXtntMap;

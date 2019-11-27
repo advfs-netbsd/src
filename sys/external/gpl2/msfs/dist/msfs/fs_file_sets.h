@@ -80,3 +80,5 @@ int
 fs_quick_frag_test (
                     bfAccessT *bfap  /* in */
                     );
+
+int fs_flush_saved_stats(bfAccessT *bfap, uint32T flags, ftxHT ftxH);
