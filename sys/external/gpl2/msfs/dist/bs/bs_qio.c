@@ -49,6 +49,7 @@
 #include <sys/file.h>
 #include <sys/mutex.h>
 #include <sys/syslog.h>
+#include <sys/proc.h>
 
 #include "../msfs/ms_public.h"
 #include "../msfs/ms_privates.h"
@@ -4119,7 +4120,7 @@ loop:
                     if (listLen) {
                         bs_q_list( ioList, listLen, q_for_io );
                     }
-                    assert_wait_mesg_timo(NULL, FALSE, "AdvFS delay", 1);
+                    kpause("AdvFS", false, 1, NULL);
                     thread_block();
                     mutex_enter(&bfap->bfIoLock);
                     goto loop;
@@ -4270,7 +4271,7 @@ loop:
                     }
                     /* Drop UBC page (pg_hold count) reference. */
                     ubc_page_release(bp->vmpage, B_WRITE);
-                    assert_wait_mesg_timo(NULL, FALSE, "AdvFS delay", 1);
+                    kpause("AdvFS", false, 1, NULL);
                     thread_block();
                     mutex_enter(&bfap->bfIoLock);
                     goto loop;
@@ -4403,7 +4404,7 @@ loop:
                     mutex_exit(&bp->bufLock);
                     /* Drop UBC page (pg_hold count) reference. */
                     ubc_page_release(bp->vmpage, B_WRITE);
-                    assert_wait_mesg_timo(NULL, FALSE, "AdvFS delay", 1);
+                    kpause("AdvFS", false, 1, NULL);
                     thread_block();
                     mutex_enter(&bfap->bfIoLock);
                     goto loop;
@@ -4562,7 +4563,7 @@ loop:
                         }
                         /* Drop UBC page (pg_hold count) reference. */
                         ubc_page_release(bp->vmpage, B_WRITE);
-                        assert_wait_mesg_timo(NULL, FALSE, "AdvFS delay", 1);
+                        kpause("AdvFS", false, 1, NULL);
                         thread_block();
                         mutex_enter(&bfap->bfIoLock);
                         goto loop;

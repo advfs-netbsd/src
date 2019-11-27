@@ -33,6 +33,8 @@
 #include <sys/mutex.h>
 #include <sys/mount.h>
 #include <sys/ucred.h>
+#include <sys/proc.h>
+#include <sys/systm.h>
 
 #include "../msfs/ms_public.h"
 #include "../msfs/ms_privates.h"
@@ -549,7 +551,7 @@ _retry:
                    */
 
                 if (ClosedAccCleanStatsInProgress) {
-                    assert_wait_mesg_timo(NULL, FALSE, "AdvFS delay", 1);
+                    kpause("AdvFS", false, 1, NULL);
                     thread_block();
                 }
                 mutex_enter(&BfAccessFreeLock);
@@ -693,7 +695,7 @@ _retry:
                 thread_wakeup((vsize_t)&SentCleanupMsg);
             }
             mutex_exit(&BfAccessFreeLock);
-            assert_wait_mesg_timo(NULL, FALSE, "AdvFS delay", 1);
+            kpause("AdvFS", false, 1, NULL);
             thread_block();
             mutex_enter(&BfAccessFreeLock);
 
@@ -1315,7 +1317,7 @@ start:
         if (lk_get_state(bfap->stateLk) == ACC_DEALLOC) {
             mutex_exit(&bfap->bfaLock);
             mutex_exit(&bfSetp->accessChainLock);
-            assert_wait_mesg_timo(NULL, FALSE, "AdvFS delay", 1);
+            kpause("AdvFS", false, 1, NULL);
             thread_block();
             goto start;
         }
@@ -3316,7 +3318,7 @@ lookup:
                  * file's vnode.
                  */
                 mutex_exit(&bfap->bfaLock);
-                assert_wait_mesg_timo(NULL, FALSE, "AdvFS delay", 1);
+                kpause("AdvFS", false, 1, NULL);
                 thread_block();
                 goto lookup;
             }
@@ -4839,7 +4841,7 @@ bs_dealloc_access(bfAccessT *bfap)
     bfap->idx_params=NULL;
     bfap->idxQuotaBlks=0;
 
-    ASSERT(bfap->dirTruncp == NULL);
+    KASSERT(bfap->dirTruncp == NULL);
     x_dealloc_extent_maps(&bfap->xtnts);
     bfap->accMagic |= MAGIC_DEALLOC;
     ms_free(bfap);
