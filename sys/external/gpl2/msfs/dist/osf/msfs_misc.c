@@ -385,7 +385,7 @@ bf_get_l(
         ((bf_tag.num == USER_QUOTA_FILE_TAG) || 
          (bf_tag.num == GROUP_QUOTA_FILE_TAG))) {
 
-        sts = getnewvnode(VT_MSFS, &msfs_vnodeops, &nvp);
+        sts = vcache_get(mp, nvp->v_data, sizeof(struct bfNode), &nvp);
         if (sts != EOK) {
             /* Be sure this lock gets released unless requested not to! */
             if (!(flag & DONT_UNLOCK)) {

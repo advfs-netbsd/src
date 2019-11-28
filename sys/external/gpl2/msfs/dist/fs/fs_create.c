@@ -186,7 +186,7 @@ fs_create_file(struct vattr *vap,         /* in - vnode attributes pointer */
     } else
         create_symlink = FALSE;
     
-    ret = getnewvnode( VT_MSFS, &msfs_vnodeops, &nvp );
+    ret = vcache_get(mp, nvp->v_data, sizeof(struct bfNode), &nvp);
     if (ret == EOK) {
         /*
          * Initialize nvp. Note that get_n_setup_vnode called
@@ -194,7 +194,7 @@ fs_create_file(struct vattr *vap,         /* in - vnode attributes pointer */
          * Here, we do enough such that any error returns do
          * proper cleanup.
          */
-        bnp = (struct bfNode *)&nvp->v_data[0];
+        bnp = (struct bfNode *)&nvp->v_data;
         bnp->fsContextp = NULL;
         bnp->accessp = NULL;
     } else {

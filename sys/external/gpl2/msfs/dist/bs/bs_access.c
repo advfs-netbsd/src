@@ -2359,7 +2359,7 @@ retry_clu_clone_access:
            (bfap->bfVp == NULL) &&
            (!got_clu_clone_vnode)) {
             mutex_exit(&bfap->bfaLock);
-            sts = getnewvnode(VT_MSFS, &msfs_vnodeops, &vp);
+            sts = vcache_get(mp, vp->v_data, sizeof(struct bfNode), &vp);
             mutex_enter(&bfap->bfaLock);
             KASSERT(bfap->refCnt > 0);
             KASSERT(BS_BFTAG_EQL(tag, bfap->tag));
@@ -2485,7 +2485,7 @@ retry_clu_clone_access:
            (options & BF_OP_GET_VNODE) &&
            (!got_clu_clone_vnode)) {
             mutex_exit(&bfap->bfaLock);
-            sts = getnewvnode(VT_MSFS, &msfs_vnodeops, &vp);
+            sts = vcache_get(mp, vp->v_data, sizeof(struct bfNode), &vp);
             mutex_enter(&bfap->bfaLock);
             KASSERT(bfap->refCnt > 0);
             KASSERT(BS_BFTAG_EQL(tag, bfap->tag));
@@ -3202,7 +3202,7 @@ get_n_setup_new_vnode(
 
     vp = *nvp;
     if ( !vp ) {
-        sts = getnewvnode( VT_MSFS, &msfs_vnodeops, &vp );
+        sts = vcache_get(vp->v_mount, vp->v_data, sizeof(struct bfNode), &vp);
         if (sts != EOK) {
             return sts;
         }
