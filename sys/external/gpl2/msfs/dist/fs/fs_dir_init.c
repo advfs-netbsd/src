@@ -1056,7 +1056,7 @@ fs_cleanup_thread(void)
                    ((FreeAcc.len > 2*AdvfsMinFreeAccess) &&
                  ((FreeAcc.len > (NumAccess *ADVFSMAXFREEACCESSPERCENT)/100) ||
                     (FreeAcc.freeFwd->bfap_free_time <
-                                (long)(sched_tick - BFAP_VALID_TIME))))) {
+                                (long)(hardclock_ticks - BFAP_VALID_TIME))))) {
                     if (mutex_tryenter(&FreeAcc.freeFwd->bfaLock)) {
                         if (FreeAcc.freeFwd->stateLk.waiters == 0) {
                             bfap = FreeAcc.freeFwd;

@@ -288,10 +288,10 @@ init_access(bfAccessT *bfap)
      * Newly allocated access structures do not inherit bfap_free_time
      * from the first access structure on the freelist (as other structures
      * added via ADD_ACC_FREELIST() do), but are instead assigned
-     * sched_tick (the current time).  This keeps them from getting
+     * hardclock_ticks (the current time).  This keeps them from getting
      * aged too soon.
      */
-    bfap->bfap_free_time = sched_tick;
+    bfap->bfap_free_time = hardclock_ticks;
     FreeAcc.len++;
     NumAccess++;
     mutex_exit(&BfAccessFreeLock);
@@ -5444,7 +5444,7 @@ void ADD_ACC_FREELIST( bfAccessT *bfap )
         if (FreeAcc.freeFwd != (bfAccessT *)&FreeAcc) {
             bfap->bfap_free_time = FreeAcc.freeFwd->bfap_free_time;
         } else {
-            bfap->bfap_free_time = sched_tick;
+            bfap->bfap_free_time = hardclock_ticks;
         }
         bfap->freeBwd = (bfAccessT *)&FreeAcc;
         bfap->freeFwd = FreeAcc.freeFwd;
@@ -5456,7 +5456,7 @@ void ADD_ACC_FREELIST( bfAccessT *bfap )
         bfap->freeFwd = (bfAccessT *)&FreeAcc;
         FreeAcc.freeBwd->freeFwd = bfap;
         FreeAcc.freeBwd = bfap;
-        bfap->bfap_free_time = sched_tick;
+        bfap->bfap_free_time = hardclock_ticks;
     }
     bfap->onFreeList = 1;
     FreeAcc.len++;
@@ -5466,7 +5466,7 @@ void ADD_ACC_FREELIST( bfAccessT *bfap )
           (FreeAcc.len > 2*AdvfsMinFreeAccess) &&
          ((FreeAcc.len > (NumAccess * ADVFSMAXFREEACCESSPERCENT)/100) ||
           (FreeAcc.freeFwd->bfap_free_time <
-                         (long)(sched_tick - BFAP_VALID_TIME)))))) {
+                         (long)(hardclock_ticks - BFAP_VALID_TIME)))))) {
         msg = (clupThreadMsgT *)msgq_alloc_msg(CleanupMsgQH);
         if (msg) {
             msg->msgType = DEALLOCATE_BFAPS;
