@@ -218,7 +218,7 @@ msfs_pl_create_rec(
 		   bfAccessT *bfAccess,          /* in     */
 		   bsRecCurT *cur,               /* in/out */
 		   ftxHT ftx,                    /* in     */
-		   caddr_t obj,                  /* in     */
+		   char *obj,                    /* in     */
 		   ushort size,                  /* in     */
 		   ushort type                   /* in     */
 		   );
@@ -671,7 +671,7 @@ msfs_pl_cur_to_pnt(
   if (sts != EOK)
       return (void *)NULL;
   else
-      return (void *)(((caddr_t)cur->bmtp) + cur->pgoff);
+      return (void *)(((char *)cur->bmtp) + cur->pgoff);
 
 } /* msfs_pl_cur_to_pnt() */
 
@@ -724,7 +724,7 @@ msfs_pl_pin_cur(
 
   rbf_pin_record(
 		 cur->pgPin, 
-		 ((caddr_t) cur->bmtp) + cur->pgoff - sizeof(bsMRT), 
+		 ((char *) cur->bmtp) + cur->pgoff - sizeof(bsMRT),
 		 size + 2*sizeof(bsMRT) 
 		 );
   return sts;
@@ -743,7 +743,7 @@ msfs_pl_seek_cur(
 		 )
 {
   bsMRT   *mrecp;
-  caddr_t    rec;
+  char     *rec;
   int     first_pass = TRUE;
   int sts        = EOK;
 
@@ -751,7 +751,7 @@ msfs_pl_seek_cur(
     /*
      * search current mcell for next record of type rtype
      */
-    rec = (caddr_t) msfs_pl_cur_to_pnt(domain, cur, &sts);
+    rec = (char *) msfs_pl_cur_to_pnt(domain, cur, &sts);
 
     /* Check for the status of the function call.  If there was some
      * error, then break out of the loop and return the error.
@@ -774,7 +774,7 @@ msfs_pl_seek_cur(
      * record found, return it
      */
     if (mrecp->type != BSR_NIL) {
-      cur->pgoff = ((caddr_t)MREC_TO_REC(mrecp)) - ((caddr_t)cur->bmtp);
+      cur->pgoff = ((char *)MREC_TO_REC(mrecp)) - ((char *)cur->bmtp);
       
       if((cur->pgoff > (ADVFS_PGSZ-sizeof(bsMRT))) ||
          (cur->MC.cell >= BSPG_CELLS)) {
@@ -915,7 +915,7 @@ msfs_setproplist_int(
 		/*
 		 * Copyin header (not name/value)
 		 */
-		error = uiomove((caddr_t)proplist_headp,
+		error = uiomove((char *)proplist_headp,
 				SIZEOF_PROPLIST_HEAD,
 				uiop);
 		if (error) {
@@ -950,7 +950,7 @@ msfs_setproplist_int(
 		/*
 		 * Copy in the name leaving uiop integer aligned
 		 */
-		error = uiomove((caddr_t)proplist_headp->pl_name,
+		error = uiomove((char *)proplist_headp->pl_name,
 				rounded_namelen, uiop);
 		if (error) {
 			goto out;
@@ -1631,12 +1631,12 @@ msfs_pl_create_rec(
 		   bfAccessT *bfAccess,          /* in     */
 		   bsRecCurT *cur,               /* in/out */
 		   ftxHT ftx,                    /* in     */
-		   caddr_t obj,                  /* in     */
+		   char *obj,                    /* in     */
 		   ushort size,                  /* in     */
 		   ushort type                   /* in     */
 		   )
 {
-    caddr_t dat_rec;
+    char *dat_rec;
     bsMRT *mrecp;
     int sts;
 
@@ -1660,7 +1660,7 @@ msfs_pl_create_rec(
     /*
      * fill in record header and empty record after
      */
-    dat_rec = (caddr_t) msfs_pl_cur_to_pnt(bfAccess->dmnP, cur, &sts);
+    dat_rec = (char *) msfs_pl_cur_to_pnt(bfAccess->dmnP, cur, &sts);
     if (sts == EOK) {
         mrecp = REC_TO_MREC(dat_rec);
         mrecp->type = type;
@@ -1720,7 +1720,7 @@ msfs_pl_findhead_setdata(
   ushort           n_mcell_alloc;
   uint64T          flags;
   int          sts=EOK;
-  caddr_t          recp;
+  char            *recp;
 
   *mcells_alloced = 0;
 
@@ -1813,7 +1813,7 @@ msfs_pl_findhead_setdata(
       }
       first = FALSE;
       if (!RECCUR_ISNIL(*hdr)) {
-	recp = (caddr_t) msfs_pl_cur_to_pnt(bfAccess->dmnP, hdr, &sts);
+	recp = (char *) msfs_pl_cur_to_pnt(bfAccess->dmnP, hdr, &sts);
         if (sts != EOK) {
             error = sts;
             goto out;
@@ -1822,7 +1822,7 @@ msfs_pl_findhead_setdata(
 	while (mrecp->type != BSR_NIL) {
 	  mrecp = NEXT_MREC(mrecp);
 	}
-	space = BSC_R_SZ - ((caddr_t)mrecp - (caddr_t)top) - 2*sizeof(bsMRT);
+	space = BSC_R_SZ - ((char *)mrecp - (char *)top) - 2*sizeof(bsMRT);
       }
     } while (
 	     (!RECCUR_ISNIL(*hdr)) &&
@@ -1866,7 +1866,7 @@ msfs_pl_findhead_setdata(
 			       bfAccess,
 			       hdr,
 			       ftx,
-			       (caddr_t) hdr_rec,
+			       (char *) hdr_rec,
 			       size,
 			       BSR_PROPLIST_HEAD
 			       );
@@ -1894,7 +1894,7 @@ msfs_pl_findhead_setdata(
       /*
        * move cur onto it and pin
        */
-      hdr->pgoff = (((caddr_t)mrecp) - (caddr_t)hdr->bmtp)
+      hdr->pgoff = (((char *)mrecp) - (char *)hdr->bmtp)
 	+ sizeof(bsMRT);
       if (hdr->pgoff > (ADVFS_PGSZ - sizeof(bsMRT))) {
 	   error = E_CORRUPT_LIST;
@@ -2013,7 +2013,7 @@ msfs_pl_findhead_setdata(
 			       bfAccess,
 			       &dat,
 			       ftx,
-			       (caddr_t) dat_rec,
+			       (char *) dat_rec,
 			       size,
 			       BSR_PROPLIST_DATA
 			       );
@@ -2186,31 +2186,31 @@ msfs_getproplist(
 	 valuelen = PROPLIST_ALLIGN(vallen);
 	 entry_size = SIZEOF_PROPLIST_ENTRY(namelen,valuelen);
 
-	 error = uiomove((caddr_t)&entry_size, sizeof(int), uiop);
+	 error = uiomove((char *)&entry_size, sizeof(int), uiop);
 	 if (error)
 	     goto out;
 
-	 error = uiomove((caddr_t)&flags, sizeof(int), uiop);
+	 error = uiomove((char *)&flags, sizeof(int), uiop);
 	 if (error)
 	     goto out;
 
-	 error = uiomove((caddr_t)&namlen, sizeof(int), uiop);
+	 error = uiomove((char *)&namlen, sizeof(int), uiop);
 	 if (error)
 	     goto out;
 
-         error = uiomove((caddr_t)&vallen, sizeof(int), uiop);
+         error = uiomove((char *)&vallen, sizeof(int), uiop);
          if (error)
 	     goto out;
       
-         error = uiomove((caddr_t)names[0], namelen, uiop);
+         error = uiomove((char *)names[0], namelen, uiop);
          if (error)
 	     goto out;
 
          /* copy the on-disk dataSafety value */
-         error = uiomove((caddr_t)&(bfparamsp->cl.dataSafety), vallen, uiop);
+         error = uiomove((char *)&(bfparamsp->cl.dataSafety), vallen, uiop);
 
          /* copy the in-memory dataSafety value */
-         error = uiomove((caddr_t)&(bfap->dataSafety), vallen, uiop);
+         error = uiomove((char *)&(bfap->dataSafety), vallen, uiop);
 
 	 *min_buf_size = 0;
 
@@ -2524,31 +2524,31 @@ msfs_pl_get_entry(
       /*
        * get header info
        */
-      error = uiomove((caddr_t)&entry_size,
+      error = uiomove((char *)&entry_size,
 		      sizeof(int),
 		      uiop);
       if (error) {
 	goto out;
       }
-      error = uiomove((caddr_t)&flags,
+      error = uiomove((char *)&flags,
 		      sizeof(int),
 		      uiop);
       if (error) {
 	goto out;
       }
-      error = uiomove((caddr_t)&hdr_rec->namelen,
+      error = uiomove((char *)&hdr_rec->namelen,
 		      sizeof(int),
 		      uiop);
       if (error) {
 	goto out;
       }
-      error = uiomove((caddr_t)&hdr_rec->valuelen,
+      error = uiomove((char *)&hdr_rec->valuelen,
 		      sizeof(int),
 		      uiop);
       if (error) {
 	goto out;
       }
-      error = uiomove((caddr_t)name_buf,
+      error = uiomove((char *)name_buf,
 		      namelen,
 		      uiop);
       if (error) {
@@ -2620,7 +2620,7 @@ msfs_pl_get_name(
     xfer = MIN(resid, cell_size-NUM_SEG_SIZE);
     bcopy(
 	  dat_rec->buffer, 	
-	  (caddr_t) &buffer[namelen - resid],
+	  (char *) &buffer[namelen - resid],
 	  xfer
 	  );
     *last_resid = resid;
@@ -2692,11 +2692,11 @@ msfs_pl_get_data(
 		    cell_size - BSR_PROPLIST_HEAD_SIZE - name_resid);
     if ((uiop != NULL) && (data_xfer != 0)) {
       if(sec_buff) {
-	bcopy((caddr_t) &hdr_rec->buffer[name_resid],sec_buff+sec_data_offset,data_xfer);
+	bcopy((char *) &hdr_rec->buffer[name_resid],sec_buff+sec_data_offset,data_xfer);
 	sec_data_offset = sec_data_offset+data_xfer;
       } else {
          error = uiomove(
-		      (caddr_t) &hdr_rec->buffer[name_resid],
+		      (char *) &hdr_rec->buffer[name_resid],
 		      data_xfer,
 		      uiop
 		      );
@@ -2738,11 +2738,11 @@ msfs_pl_get_data(
 
     if (uiop != NULL) {
       if(sec_buff) {
-	  bcopy((caddr_t) &dat_rec->buffer[name_resid],sec_buff+sec_data_offset,data_xfer);
+	  bcopy((char *) &dat_rec->buffer[name_resid],sec_buff+sec_data_offset,data_xfer);
 	  sec_data_offset = sec_data_offset+data_xfer;
       } else {
           error = uiomove(
-		      (caddr_t) &dat_rec->buffer[name_resid],
+		      (char *) &dat_rec->buffer[name_resid],
 		      data_xfer,
 		      uiop
 		      );
@@ -3874,7 +3874,7 @@ msfs_pl_findhead_setdata_v3(
 	while (mrecp->type != BSR_NIL) {
 	  mrecp = NEXT_MREC(mrecp);
 	}
-	space = BSC_R_SZ - ((caddr_t)mrecp - (caddr_t)top) - 2*sizeof(bsMRT);
+	space = BSC_R_SZ - ((char *)mrecp - (char *)top) - 2*sizeof(bsMRT);
       }
     } while (
 	     (!RECCUR_ISNIL(*hdr)) &&
@@ -3918,7 +3918,7 @@ msfs_pl_findhead_setdata_v3(
 			       bfAccess,
 			       hdr,
 			       ftx,
-			       (caddr_t) hdr_rec,
+			       (char *) hdr_rec,
 			       size,
 			       BSR_PROPLIST_HEAD
 			       );
@@ -3946,7 +3946,7 @@ msfs_pl_findhead_setdata_v3(
       /*
        * move cur onto it and pin
        */
-      hdr->pgoff = (((caddr_t)mrecp) - (caddr_t)hdr->bmtp)
+      hdr->pgoff = (((char *)mrecp) - (char *)hdr->bmtp)
 	+ sizeof(bsMRT);
       if (hdr->pgoff > (ADVFS_PGSZ - sizeof(bsMRT))) {
 	   error = E_CORRUPT_LIST;
@@ -4065,7 +4065,7 @@ msfs_pl_findhead_setdata_v3(
 			       bfAccess,
 			       &dat,
 			       ftx,
-			       (caddr_t) dat_rec,
+			       (char *) dat_rec,
 			       size,
 			       BSR_PROPLIST_DATA
 			       );
@@ -4348,31 +4348,31 @@ msfs_pl_get_entry_v3(
       /*
        * get header info
        */
-      error = uiomove((caddr_t)&entry_size,
+      error = uiomove((char *)&entry_size,
 		      sizeof(int),
 		      uiop);
       if (error) {
 	goto out;
       }
-      error = uiomove((caddr_t)&flags,
+      error = uiomove((char *)&flags,
 		      sizeof(int),
 		      uiop);
       if (error) {
 	goto out;
       }
-      error = uiomove((caddr_t)&hdr_rec->namelen,
+      error = uiomove((char *)&hdr_rec->namelen,
 		      sizeof(int),
 		      uiop);
       if (error) {
 	goto out;
       }
-      error = uiomove((caddr_t)&hdr_rec->valuelen,
+      error = uiomove((char *)&hdr_rec->valuelen,
 		      sizeof(int),
 		      uiop);
       if (error) {
 	goto out;
       }
-      error = uiomove((caddr_t)name_buf,
+      error = uiomove((char *)name_buf,
 		      namelen,
 		      uiop);
       if (error) {
@@ -4438,7 +4438,7 @@ msfs_pl_get_name_v3(
     xfer = MIN(resid, cell_size);
     bcopy(
 	  dat_rec->buffer, 
-	  (caddr_t) &buffer[namelen - resid],
+	  (char *) &buffer[namelen - resid],
 	  xfer
 	  );
     *last_resid = resid;
@@ -4506,11 +4506,11 @@ msfs_pl_get_data_v3(
 		    cell_size - BSR_PROPLIST_HEAD_SIZE_V3 - name_resid);
     if ((uiop != NULL) && (data_xfer != 0)) {
       if(sec_buff) {
-	bcopy((caddr_t) &hdr_rec->buffer[name_resid],sec_buff+sec_data_offset,data_xfer);
+	bcopy((char *) &hdr_rec->buffer[name_resid],sec_buff+sec_data_offset,data_xfer);
 	sec_data_offset = sec_data_offset+data_xfer;
       } else {
          error = uiomove(
-		      (caddr_t) &hdr_rec->buffer[name_resid],
+		      (char *) &hdr_rec->buffer[name_resid],
 		      data_xfer,
 		      uiop
 		      );
@@ -4551,11 +4551,11 @@ msfs_pl_get_data_v3(
     data_xfer = MIN(data_resid, cell_size);
     if (uiop != NULL) {
       if(sec_buff) {
-	  bcopy((caddr_t) &dat_rec->buffer[name_resid],sec_buff+sec_data_offset,data_xfer);
+	  bcopy((char *) &dat_rec->buffer[name_resid],sec_buff+sec_data_offset,data_xfer);
 	  sec_data_offset = sec_data_offset+data_xfer;
       } else {
           error = uiomove(
-		      (caddr_t) &dat_rec->buffer[name_resid],
+		      (char *) &dat_rec->buffer[name_resid],
 		      data_xfer,
 		      uiop
 		      );

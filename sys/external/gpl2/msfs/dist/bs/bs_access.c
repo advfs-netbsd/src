@@ -5162,7 +5162,7 @@ put_onto_waitlist:
         }
     }
 
-    mpsleep((caddr_t)(arp),               /* event addr */
+    mpsleep((char *)(arp),               /* event addr */
                      PZERO,               /* not interruptible */
                      "actRangeWaiter",
                      FALSE,               /* no timeout */

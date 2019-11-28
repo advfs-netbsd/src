@@ -1249,7 +1249,7 @@ idx_insert_filename(
     {
         root_page = (long)ndp->ni_hint;
         level = 0;
-        ndp->ni_hint = (caddr_t)-1;
+        ndp->ni_hint = (char *)-1;
     }
     else
     {
@@ -1689,7 +1689,7 @@ idx_remove_filename(
     {
         root_page = (long)ndp->ni_hint;
         level = 0;
-        ndp->ni_hint = (caddr_t)-1;
+        ndp->ni_hint = (char *)-1;
         using_hint = TRUE;
     }
     else
@@ -2080,10 +2080,10 @@ idx_lookup_filename(
 
     if (node_ptr->total_elements < IDX_MAX_ELEMENTS)
     {
-        ndp->ni_hint = (caddr_t)node_page;
+        ndp->ni_hint = (char *)node_page;
     }
     else
-        ndp->ni_hint = (caddr_t)-1;
+        ndp->ni_hint = (char *)-1;
 
     while(!found)
     {
@@ -2224,7 +2224,7 @@ idx_lookup_filename(
                  * file exitst and the deletions will never cause the
                  * filename tree to split
                  */
-                ndp->ni_hint = (caddr_t)node_page;
+                ndp->ni_hint = (char *)node_page;
 
                 break;
             }
@@ -4545,7 +4545,7 @@ idx_convert_dir(
      * if the hint is not initialized here bad things could happen.
      */
 
-    ndp->ni_hint = (caddr_t)-1;
+    ndp->ni_hint = (char *)-1;
 
     /* Deref the dir page */
 

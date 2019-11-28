@@ -97,11 +97,11 @@ extern pmap_t          kernel_pmap;          /* pointer to the kernel pmap */
 /*
  * msfs vfs operations.
  */
-       int  msfs_mount       (struct mount *mp, char *path, caddr_t data, struct nameidata *ndp);
+       int  msfs_mount       (struct mount *mp, char *path, char *data, struct nameidata *ndp);
        int  msfs_start       (struct mount *mp, int flags);
        int  msfs_unmount     (struct mount *mp, int mntflags);
        int  msfs_root        (struct mount *mp, struct vnode **vpp);
-       int  advfs_quotactl   (struct mount *mp, int cmds, uid_t uid, caddr_t arg);
+       int  advfs_quotactl   (struct mount *mp, int cmds, uid_t uid, char *arg);
        int  msfs_statfs      (struct mount *mp);
        int  msfs_sync        (struct mount *mp, int waitfor);
        int  msfs_fhtovp      (struct mount *mp, struct fid *fhp, struct vnode **vpp);
@@ -371,7 +371,7 @@ static DidInit = 0;
 
 msfs_mount( struct mount *mp,           /* in */
             char *path,                 /* in */
-            caddr_t data,               /* in */
+            char *data,                 /* in */
             struct nameidata *ndp )     /* in */
 {
     extern struct vnodeops msfs_vnodeops;
@@ -404,7 +404,7 @@ msfs_mount( struct mount *mp,           /* in */
     /*
      * Process export requests
      */
-    error = copyin( data, (caddr_t)&args, sizeof( struct advfs_args ) );
+    error = copyin( data, (char *)&args, sizeof( struct advfs_args ) );
     if (error != 0) {
         goto cleanup;
     }
@@ -1461,7 +1461,7 @@ cleanup:
 int
 check_vd_sizes(struct fileSetNode *fsnp)
 {
-    caddr_t         lastBlkp = NULL;            /* Buffer for reading */
+    char            *lastBlkp = NULL;           /* Buffer for reading */
     domainT         *dmnP;                      /* This domain */
     struct vd       *vdp;                       /* Current volume */
     DEVGEOMST       *geomstp = NULL;            /* For ioctl() call */
@@ -1569,11 +1569,11 @@ check_vd_sizes(struct fileSetNode *fsnp)
                      */
                     done = FALSE;
                     if (lastBlkp == NULL) {
-                        lastBlkp = (caddr_t) ms_malloc_waitok(BS_BLKSIZE +
+                        lastBlkp = (char *) ms_malloc_waitok(BS_BLKSIZE +
                                                        sizeof(struct uio) +
                                                        sizeof(struct iovec));
                         uiop = (struct uio *)(lastBlkp + BS_BLKSIZE);
-                        iovp = (struct iovec *)((caddr_t)uiop +
+                        iovp = (struct iovec *)((char *)uiop +
                                                      sizeof(struct uio));
                     }
 
@@ -1662,7 +1662,7 @@ check_vd_sizes(struct fileSetNode *fsnp)
                      * If we found the last in-use block, try to read it.
                      */
                     if (sts == EOK) {
-                        iovp->iov_base = (caddr_t)lastBlkp;
+                        iovp->iov_base = (char *)lastBlkp;
                         iovp->iov_len = BS_BLKSIZE;
                         uiop->uio_iov = iovp;
                         uiop->uio_iovcnt = 1;
@@ -1714,7 +1714,7 @@ check_vd_sizes(struct fileSetNode *fsnp)
  *
  */
 getvp(  struct vnode **vpp,     /* out */
-        caddr_t fname,          /* in */
+        char *fname,            /* in */
         struct nameidata *ndp,  /* in */
         enum uio_seg space )    /* in */
 {
@@ -2044,7 +2044,7 @@ advfs_quotactl(
         struct mount *mp,
         int cmds,
         uid_t uid,
-        caddr_t arg)
+        char *arg)
 {
     int cmd, type, error, i, kernaddr;
     int root_check = TRUE;  /* Most commands require root user check */

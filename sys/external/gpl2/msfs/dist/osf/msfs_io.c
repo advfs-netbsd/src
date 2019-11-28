@@ -1466,7 +1466,7 @@ call_disk(
      * Fill OSF buf struct.
      */
     KASSERT(ioList->targetAddr);
-    bp->b_un.b_addr = (caddr_t)ioList->targetAddr;
+    bp->b_un.b_addr = (char *)ioList->targetAddr;
 
     if (ioList->bsBuf->directIO) {
         /* Workaround to fix a panic with DirectIO user address
@@ -2144,7 +2144,7 @@ read_raw_page(
     bp->b_bcount = blksPerPg * BS_BLKSIZE;
     bp->b_dev = vp->v_rdev;
 
-    bp->b_un.b_addr = (caddr_t)pg;
+    bp->b_un.b_addr = (char *)pg;
 
     bp->b_blkno = vdblk;
 
@@ -2231,7 +2231,7 @@ write_raw_page(
     bp->b_bcount = blksPerPg * BS_BLKSIZE;
     bp->b_dev = vp->v_rdev;
 
-    bp->b_un.b_addr = (caddr_t)pg;
+    bp->b_un.b_addr = (char *)pg;
 
     bp->b_blkno = vdblk;
 

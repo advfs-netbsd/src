@@ -94,36 +94,36 @@ long AdvfsIORetryControl = 0;   /* default 0 to maintain old behavior */
 cfg_subsys_attr_t advfs_attributes[]  = {
     {"AdvfsAccessMaxPercent",                   CFG_ATTR_UINTTYPE,
      CFG_OP_QUERY | CFG_OP_CONFIGURE | CFG_OP_RECONFIGURE,
-     (caddr_t) &AdvfsAccessMaxPercent, 5, 95, 0},
+     (char *) &AdvfsAccessMaxPercent, 5, 95, 0},
     {"AdvfsSyncMmapPages",                      CFG_ATTR_INTTYPE,
      CFG_OP_QUERY | CFG_OP_CONFIGURE | CFG_OP_RECONFIGURE,
-     (caddr_t) &AdvfsSyncMmapPages, 0, 1, 0},
+     (char *) &AdvfsSyncMmapPages, 0, 1, 0},
 #ifdef ADVFS_SMP_ASSERT
     {"AdvfsEnableAsserts",                      CFG_ATTR_UINTTYPE,
      CFG_OP_QUERY | CFG_OP_CONFIGURE | CFG_OP_RECONFIGURE,
-     (caddr_t) &AdvfsEnableAsserts, 0, 1, 0},
+     (char *) &AdvfsEnableAsserts, 0, 1, 0},
     {"AdvfsAllDataLogging",                     CFG_ATTR_UINTTYPE,
      CFG_OP_QUERY | CFG_OP_CONFIGURE | CFG_OP_RECONFIGURE | CFG_HIDDEN_ATTR,
-     (caddr_t) &AdvfsAllDataLogging, 0, 1, 0},
+     (char *) &AdvfsAllDataLogging, 0, 1, 0},
     {"AdvfsCheckDDL",                           CFG_ATTR_UINTTYPE,
      CFG_OP_QUERY | CFG_OP_CONFIGURE | CFG_OP_RECONFIGURE | CFG_HIDDEN_ATTR,
-     (caddr_t) &AdvfsCheckDDL, 0, 1, 1},
+     (char *) &AdvfsCheckDDL, 0, 1, 1},
 #endif /* ADVFS_SMP_ASSERT */
     {"AdvfsReadyQLim",                          CFG_ATTR_INTTYPE,
      CFG_OP_QUERY | CFG_OP_CONFIGURE | CFG_OP_RECONFIGURE,
-     (caddr_t) &AdvfsReadyQLim, 0, 32768, 0},
+     (char *) &AdvfsReadyQLim, 0, 32768, 0},
     {"AdvfsDomainPanicLevel",                   CFG_ATTR_INTTYPE,
      CFG_OP_QUERY | CFG_OP_CONFIGURE | CFG_OP_RECONFIGURE,
-     (caddr_t) &AdvfsDomainPanicLevel, 0, 32768, 0},
+     (char *) &AdvfsDomainPanicLevel, 0, 32768, 0},
     {"AdvfsMinAccess",                      CFG_ATTR_INTTYPE,
      CFG_OP_QUERY | CFG_OP_CONFIGURE | CFG_OP_RECONFIGURE | CFG_HIDDEN_ATTR,
-     (caddr_t) &AdvfsMinAccess, 0, 200000000, 0},
+     (char *) &AdvfsMinAccess, 0, 200000000, 0},
     {"AdvfsIORetryControl",                     CFG_ATTR_ULONGTYPE,
      CFG_OP_QUERY | CFG_OP_CONFIGURE | CFG_OP_RECONFIGURE | CFG_HIDDEN_ATTR,
-     (caddr_t) &AdvfsIORetryControl, 0,ADVFS_IO_RETRY_MAX,0},
+     (char *) &AdvfsIORetryControl, 0,ADVFS_IO_RETRY_MAX,0},
     {"AdvfsFragGroupDealloc",                   CFG_ATTR_UINTTYPE,
      CFG_OP_QUERY | CFG_OP_CONFIGURE | CFG_OP_RECONFIGURE,
-     (caddr_t) &AdvfsFragGroupDealloc, 0, 1, 0},
+     (char *) &AdvfsFragGroupDealloc, 0, 1, 0},
     {"", 0, 0, 0, 0, 0, 0}      /* must be the last element */
 };
 
@@ -178,9 +178,9 @@ advfs_configure_callback(void)
  */
 advfs_configure(
     cfg_op_t                    op,
-    caddr_t                     indata,
+    char *                     indata,
     size_t                      indata_size,
-    caddr_t                     outdata,
+    char *                     outdata,
     size_t                      outdata_size)
 {
     cfg_attr_t                  *attributes;

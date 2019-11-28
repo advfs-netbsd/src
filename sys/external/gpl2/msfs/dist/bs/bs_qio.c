@@ -3644,7 +3644,7 @@ bfflush_sync(
 
         /* Block til bs_io_complete determines this IO flush sync is finished.*/
         mark_bio_wait;
-        sts = mpsleep((caddr_t)curFlushWaiter,
+        sts = mpsleep((char *)curFlushWaiter,
                       PZERO /*not interruptible*/,
                       "flushWaiter",
                       FALSE /*no timeout*/,
