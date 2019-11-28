@@ -421,4 +421,6 @@ typedef struct {
     } body;
 } clupThreadMsgT;
 
+void cleanup_closed_list(clupClosedListTypeT clean_type);
+
 #endif /*FS_DIR*/

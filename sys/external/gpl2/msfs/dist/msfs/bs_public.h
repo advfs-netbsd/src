@@ -1391,6 +1391,4 @@ bs_get_current_tag(
     bfTagT *bfTag         /* in/out */
     );
 
-void cleanup_closed_list(clupClosedListTypeT clean_type);
-
 #endif /* BS_PUBLIC */
