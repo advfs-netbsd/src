@@ -1676,7 +1676,7 @@ do_cleanup:
  */
 
 void
-bs_init_area()
+bs_init_area(void)
 {
     int i;
     bfAccessT *new_bfap;
