@@ -881,6 +881,13 @@ bs_access(
           struct vnode **vp        /* out - vnode pointer */
           );
 
+void
+bs_insmntque(
+             ftxHT ftxH,
+             bfAccessT *bfap,
+             struct mount *mp
+             );
+
 int
 bs_close(
          struct bfAccess *bfAccessp, /* in */
