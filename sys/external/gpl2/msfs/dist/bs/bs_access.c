@@ -35,6 +35,7 @@
 #include <sys/ucred.h>
 #include <sys/proc.h>
 #include <sys/systm.h>
+#include <sys/mount.h>
 
 #include "../msfs/ms_public.h"
 #include "../msfs/ms_privates.h"
@@ -2031,10 +2032,11 @@ bs_insmntque(
 
         /*
          * insmntque() gets a vm_object if the type is VREG, so trick it
+         * XXX TESTME!!
          */
         tsave = vp->v_type;
         vp->v_type = VNON;
-        insmntque( vp, mp, 0 );
+        vfs_insmntque( vp, mp );
         vp->v_type = tsave;
 
         /*
