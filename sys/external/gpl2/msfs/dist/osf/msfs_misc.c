@@ -999,6 +999,8 @@ msfs_inactive(
     }
 
     VN_LOCK(vp);
+#ifndef __NetBSD__
+    /* On NetBSD Revoked vnode is already gone so we do not needs to do that*/
     /*
      * Dispose of revoked vnodes.
      * Note that it is VERY important that the reclaim op be called before
@@ -1007,7 +1009,7 @@ msfs_inactive(
      */
     if (vp->v_flag & VREVOKED)
         (void) vgone(vp, VX_INACTIVE, 0);
-
+#endif
     /*
      * Okay to clear out our accessp now. 
      * Note that we MUST hold VN_LOCK, to assure that we don't
