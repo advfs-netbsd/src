@@ -60,6 +60,7 @@
 #include "../msfs/ftx_public.h"
 #include "../msfs/ms_assert.h"
 #include "../msfs/bs_params.h"
+#include "../msfs/bs_public.h"
 
 #define POSIX1B_MSFS_SYNC_STATS
 

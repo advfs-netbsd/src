@@ -1393,4 +1393,14 @@ bmt_refpg(
     bfPageRefHintT refHint         /* in - hint to do read ahead */
     );
 
+int
+bs_refpg_fetch(
+    bfPageRefHT *bfPageRefH,       /* out */
+    void **bfPageAddr,             /* out - address of bf data */
+    struct bfAccess *bfap,         /* in */
+    unsigned long bsPage,          /* in - bf page number */
+    bfPageRefHintT refHint,        /* in - hint to do read ahead */
+    int fetchPages                 /* in - hint to do prefetch */
+    );
+
 #endif /* BS_PUBLIC */
