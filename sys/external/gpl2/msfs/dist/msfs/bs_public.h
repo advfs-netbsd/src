@@ -212,6 +212,11 @@ extern bfPageRefHT NilBfPageRefH;
  */
 typedef struct bfSet bfSetT;
 
+/*
+ * This is defined here as well as in bs_access.h to keep the compiler happy.
+ */
+typedef struct bfAccess bfAccessT;
+
 #define BFSET_VALID( _bfSetp )                                          \
 (                                                                       \
     (_bfSetp) != NULL && (_bfSetp)->bfSetMagic == SETMAGIC              \

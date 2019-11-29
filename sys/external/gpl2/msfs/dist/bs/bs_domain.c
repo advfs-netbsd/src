@@ -3009,7 +3009,7 @@ setup_vd(
      * or devices that respond with zero transfer sizes.
      */
     bzero(&geomst, sizeof(DEVGEOMST));
-    VOP_IOCTL(vnodep, DEVGETGEOM, (caddr_t)&geomst, FREAD,
+    VOP_IOCTL(vnodep, DEVGETGEOM, (char *)&geomst, FREAD,
               NOCRED, i, &result);
     if (i != 0 || geomst.geom_info.prefer_trans == 0 ||
         geomst.geom_info.max_trans == 0) {

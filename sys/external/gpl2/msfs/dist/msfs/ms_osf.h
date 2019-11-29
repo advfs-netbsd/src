@@ -247,13 +247,13 @@ static inline void FILESET_UNLOCK(krwlock_t *fsl)
  * real bfAccessT pointer in the root bfSet. 
  */
 #define VTOA(vp) \
- ((((struct bfNode *)(&(vp)->v_data[0]))->accessp \
-     && (((struct bfNode *)(&(vp)->v_data[0]))->accessp->real_bfap))? \
-     (((struct bfNode *)(&(vp)->v_data[0]))->accessp->real_bfap): \
-     (((struct bfNode *)(&(vp)->v_data[0]))->accessp))
+ ((((struct bfNode *)(&(vp)->v_data))->accessp \
+     && (((struct bfNode *)(&(vp)->v_data))->accessp->real_bfap))? \
+     (((struct bfNode *)(&(vp)->v_data))->accessp->real_bfap): \
+     (((struct bfNode *)(&(vp)->v_data))->accessp))
 
 /* Given a vnode pointer, return the fsContext pointer. */
-#define VTOC(vp) (((struct bfNode *)(&(vp)->v_data[0]))->fsContextp)
+#define VTOC(vp) (((struct bfNode *)(&(vp)->v_data))->fsContextp)
 
 /* Extract the user id from an fsContext structure. */
 #define CPTOUID(cp) (cp)->dir_stats.advfs_st_uid

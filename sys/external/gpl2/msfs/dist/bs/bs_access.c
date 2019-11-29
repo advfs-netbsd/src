@@ -287,10 +287,10 @@ init_access(bfAccessT *bfap)
      * Newly allocated access structures do not inherit bfap_free_time
      * from the first access structure on the freelist (as other structures
      * added via ADD_ACC_FREELIST() do), but are instead assigned
-     * sched_tick (the current time).  This keeps them from getting
+     * hardclock_ticks (the current time).  This keeps them from getting
      * aged too soon.
      */
-    bfap->bfap_free_time = sched_tick;
+    bfap->bfap_free_time = hardclock_ticks;
     FreeAcc.len++;
     NumAccess++;
     mutex_exit(&BfAccessFreeLock);
@@ -1675,7 +1675,7 @@ do_cleanup:
  */
 
 void
-bs_init_area()
+bs_init_area(void)
 {
     int i;
     bfAccessT *new_bfap;
@@ -2031,10 +2031,11 @@ bs_insmntque(
 
         /*
          * insmntque() gets a vm_object if the type is VREG, so trick it
+         * XXX TESTME!!
          */
         tsave = vp->v_type;
         vp->v_type = VNON;
-        insmntque( vp, mp, 0 );
+        vfs_insmntque( vp, mp );
         vp->v_type = tsave;
 
         /*
@@ -2357,7 +2358,7 @@ retry_clu_clone_access:
            (bfap->bfVp == NULL) &&
            (!got_clu_clone_vnode)) {
             mutex_exit(&bfap->bfaLock);
-            sts = getnewvnode(VT_MSFS, &msfs_vnodeops, &vp);
+            sts = vcache_get(mp, vp->v_data, sizeof(struct bfNode), &vp);
             mutex_enter(&bfap->bfaLock);
             KASSERT(bfap->refCnt > 0);
             KASSERT(BS_BFTAG_EQL(tag, bfap->tag));
@@ -2483,7 +2484,7 @@ retry_clu_clone_access:
            (options & BF_OP_GET_VNODE) &&
            (!got_clu_clone_vnode)) {
             mutex_exit(&bfap->bfaLock);
-            sts = getnewvnode(VT_MSFS, &msfs_vnodeops, &vp);
+            sts = vcache_get(mp, vp->v_data, sizeof(struct bfNode), &vp);
             mutex_enter(&bfap->bfaLock);
             KASSERT(bfap->refCnt > 0);
             KASSERT(BS_BFTAG_EQL(tag, bfap->tag));
@@ -3200,7 +3201,7 @@ get_n_setup_new_vnode(
 
     vp = *nvp;
     if ( !vp ) {
-        sts = getnewvnode( VT_MSFS, &msfs_vnodeops, &vp );
+        sts = vcache_get(vp->v_mount, vp->v_data, sizeof(struct bfNode), &vp);
         if (sts != EOK) {
             return sts;
         }
@@ -5162,7 +5163,7 @@ put_onto_waitlist:
         }
     }
 
-    mpsleep((caddr_t)(arp),               /* event addr */
+    mpsleep((char *)(arp),               /* event addr */
                      PZERO,               /* not interruptible */
                      "actRangeWaiter",
                      FALSE,               /* no timeout */
@@ -5442,7 +5443,7 @@ void ADD_ACC_FREELIST( bfAccessT *bfap )
         if (FreeAcc.freeFwd != (bfAccessT *)&FreeAcc) {
             bfap->bfap_free_time = FreeAcc.freeFwd->bfap_free_time;
         } else {
-            bfap->bfap_free_time = sched_tick;
+            bfap->bfap_free_time = hardclock_ticks;
         }
         bfap->freeBwd = (bfAccessT *)&FreeAcc;
         bfap->freeFwd = FreeAcc.freeFwd;
@@ -5454,7 +5455,7 @@ void ADD_ACC_FREELIST( bfAccessT *bfap )
         bfap->freeFwd = (bfAccessT *)&FreeAcc;
         FreeAcc.freeBwd->freeFwd = bfap;
         FreeAcc.freeBwd = bfap;
-        bfap->bfap_free_time = sched_tick;
+        bfap->bfap_free_time = hardclock_ticks;
     }
     bfap->onFreeList = 1;
     FreeAcc.len++;
@@ -5464,7 +5465,7 @@ void ADD_ACC_FREELIST( bfAccessT *bfap )
           (FreeAcc.len > 2*AdvfsMinFreeAccess) &&
          ((FreeAcc.len > (NumAccess * ADVFSMAXFREEACCESSPERCENT)/100) ||
           (FreeAcc.freeFwd->bfap_free_time <
-                         (long)(sched_tick - BFAP_VALID_TIME)))))) {
+                         (long)(hardclock_ticks - BFAP_VALID_TIME)))))) {
         msg = (clupThreadMsgT *)msgq_alloc_msg(CleanupMsgQH);
         if (msg) {
             msg->msgType = DEALLOCATE_BFAPS;

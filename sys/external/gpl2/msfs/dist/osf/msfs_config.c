@@ -61,9 +61,9 @@ extern struct msfsops msfs_vfsops;
 int 
 msfs_fs_configure(
 	cfg_op_t op,
-	caddr_t indata,
+	char *indata,
 	size_t indatalen,
-	caddr_t outdata,
+	char *outdata,
 	size_t outdatalen)
 {
     int ret;

@@ -41,6 +41,7 @@
 #include "../msfs/ms_assert.h"
 #include "../msfs/bs_index.h"
 #include "../msfs/bs_params.h"
+#include "../msfs/bs_public.h"
 
 
 #define ADVFS_MODULE MSFS_MISC
@@ -384,7 +385,7 @@ bf_get_l(
         ((bf_tag.num == USER_QUOTA_FILE_TAG) || 
          (bf_tag.num == GROUP_QUOTA_FILE_TAG))) {
 
-        sts = getnewvnode(VT_MSFS, &msfs_vnodeops, &nvp);
+        sts = vcache_get(mp, nvp->v_data, sizeof(struct bfNode), &nvp);
         if (sts != EOK) {
             /* Be sure this lock gets released unless requested not to! */
             if (!(flag & DONT_UNLOCK)) {
@@ -998,6 +999,8 @@ msfs_inactive(
     }
 
     VN_LOCK(vp);
+#ifndef __NetBSD__
+    /* On NetBSD Revoked vnode is already gone so we do not needs to do that*/
     /*
      * Dispose of revoked vnodes.
      * Note that it is VERY important that the reclaim op be called before
@@ -1006,7 +1009,7 @@ msfs_inactive(
      */
     if (vp->v_flag & VREVOKED)
         (void) vgone(vp, VX_INACTIVE, 0);
-
+#endif
     /*
      * Okay to clear out our accessp now. 
      * Note that we MUST hold VN_LOCK, to assure that we don't

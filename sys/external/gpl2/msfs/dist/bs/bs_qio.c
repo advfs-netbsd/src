@@ -1711,7 +1711,7 @@ bs_q_lazy(
          * databases or build systems).
          */
         if ( bp->sync_stamp == 0 || dmnp->smsync_policy&M_SMSYNC2 )
-            bp->sync_stamp = sched_tick;
+            bp->sync_stamp = hardclock_ticks;
         mutex_exit( &bp->bufLock );
         tmp = tmp->fwd;
     } while ( i-- );
@@ -3644,7 +3644,7 @@ bfflush_sync(
 
         /* Block til bs_io_complete determines this IO flush sync is finished.*/
         mark_bio_wait;
-        sts = mpsleep((caddr_t)curFlushWaiter,
+        sts = mpsleep((char *)curFlushWaiter,
                       PZERO /*not interruptible*/,
                       "flushWaiter",
                       FALSE /*no timeout*/,
@@ -5633,7 +5633,7 @@ add_to_smsync(
          * Add buffer to the smoothsync queue which will get processed at
          * the time at which the buffer has sufficiently aged.
          */
-        if ( sched_tick - iop->bsBuf->sync_stamp < smsync_age && period ) {
+        if ( hardclock_ticks - iop->bsBuf->sync_stamp < smsync_age && period ) {
             /* 
              * Avoid the cost of the division operation for the
              * common cases of smsync_period value of 1, 2, or 4
@@ -5654,7 +5654,7 @@ add_to_smsync(
             stampq = (stamp+smsync_step) % SMSYNC_NQS;
             SMSYNC_DBG( SMSYNC_DBG_BUF,
                 aprintf ( "addtosmsync:   bsBuf 0x%lx  added onto smSyncQ %d (time %d, stamp %d)  vd 0x%lx\n",
-                iop->bsBuf, stampq, sched_tick, stamp, vdp ));
+                iop->bsBuf, stampq, hardclock_ticks, stamp, vdp ));
 
             /* Remove iop from incoming list and put it onto the appropriate 
              * smoothsync queue. The waitLazy queue lock is held or the
@@ -5781,13 +5781,13 @@ smsync_to_readyq( struct vd *vdp, int flushFlag )
         switch ( period ) {
         case 0:     j = 0;
                     break;
-        case 1:     j = sched_tick;
+        case 1:     j = hardclock_ticks;
                     break;
-        case 2:     j = sched_tick >> 1;
+        case 2:     j = hardclock_ticks >> 1;
                     break;
-        case 4:     j = sched_tick >> 2;
+        case 4:     j = hardclock_ticks >> 2;
                     break;
-        default:    j = sched_tick/period;
+        default:    j = hardclock_ticks/period;
         }
         to = (j+1)%SMSYNC_NQS;
         if ( from <= to )

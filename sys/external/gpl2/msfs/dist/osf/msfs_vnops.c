@@ -1323,7 +1323,7 @@ fs_setattr_truncate( bfAccessT *bfap,
             struct iovec iov;
             int zero = 0;
 
-            iov.iov_base = (caddr_t)&zero;
+            iov.iov_base = (char *)&zero;
             iov.iov_len = 1;
             uio.uio_iov = &iov;
             uio.uio_iovcnt = 1;
@@ -1770,12 +1770,12 @@ typedef struct stg_alloc {
  *
  * struct vnode *vp      vnode pointer (in)
  * int cmd               Command, GETCACHEPOLICY or SETCACHEPOLICY (in)
- * caddr_t data          CS_DIRECTIO or CS_CACHE (in and out)
+ * char *data            CS_DIRECTIO or CS_CACHE (in and out)
  * int fflag             Unused (in)
  * struct uucred *cred    Unused (in)
  */
 int
-msfs_ioctl(struct vnode *vp, int cmd, caddr_t data,
+msfs_ioctl(struct vnode *vp, int cmd, char *data,
            int fflag, struct uucred *cred)
 {
     int retval;
@@ -4390,9 +4390,9 @@ msfs_strategy(struct buf *bp)
 
     fp = (struct file *)bp->b_rvp;
 
-    vec[0].iov_base = (caddr_t)bp->b_un.b_addr;
+    vec[0].iov_base = (char *)bp->b_un.b_addr;
     vec[0].iov_len = bp->b_bcount;
-    vec[1].iov_base = (caddr_t)vec;
+    vec[1].iov_base = (char *)vec;
     vec[1].iov_len = 0;
 
     /*
@@ -4401,7 +4401,7 @@ msfs_strategy(struct buf *bp)
      * The iov_len is used as a flag to determine if there
      * is a queued I/O after fs_read/write() is called.
      */
-    vec[2].iov_base = (caddr_t)bp;
+    vec[2].iov_base = (char *)bp;
     vec[2].iov_len = 0;
 
     /*
