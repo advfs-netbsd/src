@@ -78,6 +78,7 @@
 #include "../msfs/ftx_public.h"
 #include "../msfs/ftx_privates.h"
 #include "../msfs/bs_msg_queue.h"
+#include "../msfs/bs_public.h"
 
 #define ADVFS_MODULE BS_BMT_UTIL
 

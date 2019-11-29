@@ -1384,4 +1384,13 @@ bs_get_current_tag(
     bfTagT *bfTag         /* in/out */
     );
 
+int
+bmt_refpg(
+    bfPageRefHT *bfPageRefH,       /* out */
+    void **bfPageAddr,             /* out - address of bf data */
+    struct bfAccess *bfap,         /* in */
+    unsigned long bsPage,          /* in - bf page number */
+    bfPageRefHintT refHint         /* in - hint to do read ahead */
+    );
+
 #endif /* BS_PUBLIC */

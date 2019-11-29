@@ -49,6 +49,7 @@
 #include "../msfs/bs_msg_queue.h"
 #include "../msfs/bs_access.h"
 #include "../msfs/fs_dir.h"
+#include "../msfs/bs_public.h"
 
 static bfAccessT *get_free_acc(int *retry, int forceFlag);
 

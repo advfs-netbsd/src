@@ -57,6 +57,7 @@
 #include "../msfs/fs_dir.h"
 #include "../msfs/fs_dir_routines.h"
 #include "../msfs/msfs_syscalls.h"
+#include "../msfs/bs_public.h"
 
 
 

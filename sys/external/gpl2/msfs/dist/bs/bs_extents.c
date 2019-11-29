@@ -55,6 +55,7 @@
 #include "../msfs/bs_migrate.h"
 #include "../msfs/bs_stg.h"
 #include "../msfs/bs_stripe.h"
+#include "../msfs/bs_public.h"
 
 #define ADVFS_MODULE BS_EXTENTS
 

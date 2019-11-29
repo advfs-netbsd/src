@@ -57,6 +57,7 @@
 #include "../msfs/bs_params.h"
 #include "../msfs/bs_stripe.h"
 #include "../msfs/bs_index.h"
+#include "../msfs/bs_public.h"
 
 #define ADVFS_MODULE BS_DELETE
 

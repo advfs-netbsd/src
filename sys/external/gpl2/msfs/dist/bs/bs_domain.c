@@ -69,6 +69,7 @@
 #include "../msfs/bs_inmem_map.h"
 #include "../msfs/bs_migrate.h"
 #include "../msfs/msfs_syscalls.h"
+#include "../msfs/bs_public.h"
 
 /*  This sentinel pointer is init'd to the first advfs domain
 *   mounted.  It is used primarily for locating all domains
