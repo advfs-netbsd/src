@@ -604,7 +604,7 @@ _retry:
                 cleanup_pass2_vgone++;
                 mutex_exit(&BfAccessFreeLock);
                 mutex_exit(&bfap->bfaLock);
-                vgone(vp, VX_NOSLEEP, 0);
+                vrecycle(vp);
                 VN_UNLOCK(vp);
                 mutex_enter(&BfAccessFreeLock);
             } else {
