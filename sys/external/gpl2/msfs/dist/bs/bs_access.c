@@ -1626,7 +1626,7 @@ bs_reclaim_cfs_rsvd_vn(
                        */
 
                        if(vp->v_tag == VT_CFS) {
-                           vgone(vp, VX_NOSLEEP | VX_INACTIVE, NULL);
+                           vrecycle(vp);
                        }
 
                        VN_UNLOCK(vp);
@@ -3541,7 +3541,7 @@ lookup:
             bnp->bfSetId = nilBfSetId;
             bnp->tag = NilBfTag;
 
-            vgone(vp, VX_NOSLEEP, 0);
+            vrecycle(vp);
             VN_UNLOCK(vp);
         } else {
             VN_UNLOCK(vp);
@@ -4792,7 +4792,7 @@ bs_dealloc_access(bfAccessT *bfap)
             wait_for_vxlock2(vp, VX_NOLOCK, 0);
         }
         if (vp->v_usecount == 0 && vp->v_tag == VT_MSFS) {
-            vgone(vp, VX_NOSLEEP, 0);
+            vrecycle(vp);
             VN_UNLOCK(vp);
         } else {
             VN_UNLOCK(vp);
