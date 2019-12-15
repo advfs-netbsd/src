@@ -141,6 +141,23 @@ int is_cfs(void);
  */
 int clu_is_failover(int mnt_flags);
 
+/*
+ * Check if given mount is global root
+ * This is CFS routine and currently is not supported
+ */
+int clu_is_globroot(int mnt_flags);
+
+int clu_is_globroot(int flags)
+{
+#ifndef ADVFS_CFS
+    /* For non-Cluster global root is a only mount */
+    return 1;
+#else
+#error "CLUSTER FILE SYSTEM NOT SUPPORTED!"
+    /* return flag & M_GLOBAL_ROOT; */
+#endif
+}
+
 int clu_is_failover(int flags)
 {
 #ifndef ADVFS_CFS
