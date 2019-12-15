@@ -6297,11 +6297,11 @@ msfs_process_deferred_delete_list(
     bfsQueueT *entry;
     struct mount *mp;
 
-    if (!(flag & M_GLOBAL_ROOT))
+    if (!clu_is_globroot((int)flag))
         DMNTBL_LOCK_WRITE( &DmnTblLock );    
     dmnP = domain_name_lookup(dmnName, flag);
     if (TEST_DMNP(dmnP) != EOK) {
-        if (!(flag & M_GLOBAL_ROOT))
+        if (!clu_is_globroot((int)flag))
             DMNTBL_UNLOCK( &DmnTblLock );
         return(EBAD_DOMAIN_POINTER);
     }
@@ -6335,7 +6335,7 @@ msfs_process_deferred_delete_list(
         }
         entry = entry->bfsQfwd;
     }
-    if (!(flag & M_GLOBAL_ROOT))
+    if (!clu_is_globroot((int)flag))
         DMNTBL_UNLOCK( &DmnTblLock );
     return 0;
 }

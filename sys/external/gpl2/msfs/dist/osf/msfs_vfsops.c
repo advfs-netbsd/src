@@ -204,7 +204,7 @@ msfs_mountroot(mp, vpp)
     mp->m_uid = 0;
     mp->m_mounth = (struct vnode *)0;
 
-    if (flag & M_GLOBAL_ROOT) {
+    if (clu_is_globroot(flag)) {
         /* Mounting cluster global root - must get root dev array
          * from global_rootdev and initialize global_rootdev_count
          * vnodes.
@@ -263,7 +263,7 @@ msfs_mountroot(mp, vpp)
     }
 
     error = advfs_mountfs(mp);
-    if (flag & M_GLOBAL_ROOT) {
+    if (clu_is_globroot(flag)) {
         ms_free(GlobalRootVpp);
     }
     FREE(mp->m_stat.f_mntonname, M_PATHNAME);
@@ -748,8 +748,8 @@ msfs_mount( struct mount *mp,           /* in */
 
             MountWriteDelay = 0;    /* Write delay is only for root */
 
-            if ( clu_is_ready() &&
-                (mp->m_flag & (M_GLOBAL_ROOT | M_LOCAL_ROOT)) != 0 ) {
+            if ( clu_is_ready() && clu_is_globroot(mp->m_flag) ||
+                (mp->m_flag & M_LOCAL_ROOT) != 0 ) {
                 /*
                  * Issue the mount event for the cluster root now (global or
                  * local root), because we have the real domain and fileset
@@ -1283,7 +1283,9 @@ advfs_mountfs(struct mount *mp)
          * recovery thread need not acquire DmnTblLock.
          */
         if ( clu_is_failover(flag) && ((strcmp(setp->dmnP->domainName, "cluster_root")) == 0 ) ) {
+#ifdef ADVFS_CFS
                 dmnState = M_GLOBAL_ROOT;
+#endif
         }
         else {
                 dmnState = 0;
@@ -1340,7 +1342,9 @@ advfs_mountfs(struct mount *mp)
          * recovery thread need not acquire DmnTblLock.
          */
         if ( clu_is_failover(flag) && ((strcmp(setp->dmnP->domainName, "cluster_root")) == 0 ) ) {
+#ifdef ADVFS_CFS
                 dmnState = M_GLOBAL_ROOT;
+#endif
         }
         else {
                 dmnState = 0;
@@ -1357,8 +1361,8 @@ advfs_mountfs(struct mount *mp)
         setp->bfSetFlags &= ~BFS_IM_DIRECTIO;
     }
 
-    if ( clu_is_ready() &&
-        (mp->m_flag & (M_GLOBAL_ROOT | M_LOCAL_ROOT)) != 0 ) {
+    if ( clu_is_ready() && (clu_is_globroot(mp->m_flag) ||
+        (mp->m_flag & M_LOCAL_ROOT) != 0 )) {
         /*
          * Suppress the event for cluster root (global or local) because at
          * this point in time the domain and fileset names are either
@@ -1770,8 +1774,7 @@ msfs_unmount(
     int restart_quotas = FALSE, fragBfClosed = FALSE;
     int restart_vfast = FALSE, nonrdonly_mount = FALSE;
     bfsStateT bfs_state;
-    u_long cfsState = clu_is_failover(advfs_flags) &&
-                      (advfs_flags & M_GLOBAL_ROOT) ? M_GLOBAL_ROOT : 0;
+    u_long cfsState = clu_is_failover(advfs_flags) && clu_is_globroot(advfs_flags);
     long busy;
 
     fsnp = GETFILESETNODE(mp);

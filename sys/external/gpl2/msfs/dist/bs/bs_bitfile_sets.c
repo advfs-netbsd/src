@@ -4404,8 +4404,10 @@ bs_bfs_delete(
     refCnt = 0;  /* refCnt is also a BfSetTablLock-needs-unlock flag */
     BFSETTBL_UNLOCK( dmnP );
 
-    if( clu_is_failover((int)flag) && (flag & M_GLOBAL_ROOT) ) {
+    if( clu_is_failover((int)flag) && clu_is_globroot((int)flag) ) {
+#ifdef ADVFS_CFS
 		dmnState =  M_GLOBAL_ROOT;
+#endif
     }
     else {
 		dmnState = 0;
@@ -4669,8 +4671,10 @@ bs_bfs_delete(
         BFSETTBL_UNLOCK( dmnP );
     }
 
-    if( clu_is_failover((int)flag) && (flag & M_GLOBAL_ROOT) ) {
+    if( clu_is_failover((int)flag) && clu_is_globroot((int)flag) ) {
+#ifdef ADVFS_CFS
 		dmnState =  M_GLOBAL_ROOT;
+#endif
     }
     else {
 		 dmnState = 0;
@@ -4730,8 +4734,10 @@ HANDLE_EXCEPTION:
         bs_bfs_close(bfSetp, ftxH, BFS_OP_DEF);
     }
 
-    if( clu_is_failover((int)flag) && (flag & M_GLOBAL_ROOT) ) {
+    if( clu_is_failover((int)flag) && clu_is_globroot((int)flag) ) {
+#ifdef ADVFS_CFS
 		dmnState =  M_GLOBAL_ROOT;
+#endif
     }
     else {
 		 dmnState = 0;
@@ -5494,7 +5500,7 @@ bs_bfset_activate(
          */
         
         sts = bs_bfs_find_set( bfSetName, dmnP, 
-                           flag & (M_LOCAL_ROOT | M_GLOBAL_ROOT), &setParams);
+               clu_is_globroot((int)flag) || (flag & M_LOCAL_ROOT), &setParams);
 
         if (sts != EOK) {
             /* The set doesn't exist! */

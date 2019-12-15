@@ -1521,7 +1521,7 @@ ss_dmn_activate(domainT *dmnP,u_long flag)
     return;
 
 HANDLE_EXCEPTION:
-    if ( clu_is_failover((int)flag) && ( flag & M_GLOBAL_ROOT ) )
+    if ( clu_is_failover((int)flag) && clu_is_globroot((int)flag) )
 	dmnState = M_GLOBAL_ROOT;
     else
 	dmnState = 0;		
@@ -1671,7 +1671,7 @@ ss_change_state(char *domain_name,    /* in */
     int ssDmnLocked = FALSE;
     u_long recoveryFlag = *dmnState;		
     
-    if ( recoveryFlag & M_GLOBAL_ROOT )
+    if (clu_is_globroot((int)recoveryFlag))
         sts = bs_bfdmn_tbl_activate( domain_name,
                                      M_GLOBAL_ROOT,
                                      &domainId );

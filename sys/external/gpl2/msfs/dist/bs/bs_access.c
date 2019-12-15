@@ -3028,7 +3028,7 @@ retry_clu_clone_access:
          * to the state in the access structure will reset the
          * state within the access structure to ACC_VALID.
          */
-        if ((clu_is_ready()) && clu_is_failover(mp->m_flag) &&
+        if ((clu_is_ready()) && clu_is_failover(mp->m_flag) && 
             (bfap->bfState == BSRA_DELETING)) {
             bfaccState = ACC_VALID;
         }

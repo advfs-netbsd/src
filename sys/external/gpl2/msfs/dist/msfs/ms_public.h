@@ -124,7 +124,7 @@ dev_t bs_bfset_get_dev( bfSetT *bfSetp );
  */
 void
 task_getrusage( struct rusage * ru);
-
+/******************************************************************************/
 /*
  * Part of clu.h - this function check setup of CFS
  * Currently Clustering is not supported.
@@ -146,6 +146,9 @@ int clu_is_failover(int mnt_flags);
  * This is CFS routine and currently is not supported
  */
 int clu_is_globroot(int mnt_flags);
+
+#define	M_GLOBAL_ROOT   0x20000000      /* CFS global root mount */
+
 
 int clu_is_globroot(int flags)
 {

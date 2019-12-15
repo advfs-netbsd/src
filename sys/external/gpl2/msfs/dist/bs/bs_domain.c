@@ -478,7 +478,8 @@ start:
     dualMountId = nilBfDomainId;
     closeVd = FALSE;
     dmnTblLocked = FALSE;
-    isRoot = flag & (M_LOCAL_ROOT | M_GLOBAL_ROOT | M_GLROOT_OTHER);
+    isRoot = (flag & (M_LOCAL_ROOT | M_GLROOT_OTHER)) ||
+              clu_is_globroot((int)flag);
     isMount = flag & M_MSFS_MOUNT;
     bzero(&dmnMAttr, sizeof(bsDmnMAttrT));
     dmnMAttrIdx = 0;
@@ -487,7 +488,7 @@ start:
     unlink_and_restart = FALSE;
     volPathName = NULL;
 
-    if (flag & M_GLOBAL_ROOT) {
+    if (clu_is_globroot((int)flag)) {
         sts = bs_global_root_activate(domainName, flag, bfDomainId);
         return sts;
     }
@@ -1644,7 +1645,7 @@ bs_bfdmn_deactivate(
      * prevent multiple global root deactivations. Taking this lock out
      * for root causes deadlocks during global root failover.
      */
-    if (!(flag & M_GLOBAL_ROOT)) {
+    if (!clu_is_globroot((int)flag)) {
         DMNTBL_LOCK_WRITE( &DmnTblLock );
         tblLocked = TRUE;
     }
@@ -1896,7 +1897,9 @@ bs_bfdmn_activate(
     extern int MountWriteDelay;
     bfDmnStatesT orig_dmnP_state;
 
-    KASSERT((flag & M_GLOBAL_ROOT) ? 1 : rw_lock_held(&DmnTblLock));
+    if (!clu_is_globroot((int)flag)) {
+        KASSERT(rw_lock_held(&DmnTblLock));
+    }
     if( (dmnP = domain_lookup( domainId, flag )) == 0 ) {
         return( ENO_SUCH_DOMAIN );
     }
@@ -1992,7 +1995,7 @@ bs_bfdmn_activate(
      * If mounting root FS, decide whether we should delay writes by finding
      * out the size of the log.
      */
-    if (flag & (M_GLOBAL_ROOT | M_LOCAL_ROOT)) {
+    if (clu_is_globroot(flag) || (flag & M_LOCAL_ROOT)) {
         if (num_of_log_recs(dmnP, LIMIT_RECOV_DELAY) < LIMIT_RECOV_DELAY)
         MountWriteDelay = 1;
     }
@@ -2648,14 +2651,14 @@ get_raw_vd_attrs(
     struct vnode *vp = NULL;
     struct nameidata *ndp = &u.u_nd;
     int attridx = BFM_RBMT_EXT;
-    int isRoot = flag & (M_LOCAL_ROOT | M_GLOBAL_ROOT);
+    int isRoot = (flag & M_LOCAL_ROOT) || clu_is_globroot(flag);
     int isMount = flag & M_MSFS_MOUNT;
     extern struct vnode **GlobalRootVpp;
 
     /* get device's vnode */
     if (isRoot & M_LOCAL_ROOT) {
         vp = rootvp;
-    } else if (isRoot & M_GLOBAL_ROOT) {
+    } else if (clu_is_globroot(flag)) {
         vp = GlobalRootVpp[vdi];
     } else {
         if((error = getvp( &vp, vdDiskName, ndp, UIO_SYSSPACE ))) {
@@ -2908,7 +2911,8 @@ setup_vd(
     extern int max_iosize_read;         /* default system-wide max read size */
     extern long lbolt;
 
-    KASSERT((flag & M_GLOBAL_ROOT) ? 1 : rw_lock_held(&DmnTblLock));
+    if (!clu_is_globroot((int)flag))
+        KASSERT(rw_lock_held(&DmnTblLock));
 
     if ((sts = vd_alloc(&vdp, dmnP)) != EOK) {
         return sts;
@@ -5744,9 +5748,9 @@ domain_lookup(
     int key;
     domainT *dmnP_start, *dmnP;
 
-    KASSERT((flag & M_GLOBAL_ROOT) ? 1 : 
-                   mutex_owned(&DmnTblMutex) || rw_lock_held(&DmnTblLock));
-
+    if (!clu_is_globroot((int)flag)) {
+        mutex_owned(&DmnTblMutex) || rw_lock_held(&DmnTblLock);
+    }
     key = DOMAIN_GET_HASH_KEY( bfDomainId );
     dmnP_start = DOMAIN_HASH_LOCK( key, NULL);  /* get bucket */
 
@@ -5792,7 +5796,7 @@ domain_name_lookup(
 {
     domainT *dmnP_Prev, *dmnP;
 
-    if (!(flag & (M_GLOBAL_ROOT|M_GLROOT_OTHER))) {
+    if (!clu_is_globroot((int)flag) && !(flag & M_GLROOT_OTHER)) {
         KASSERT(lock_islocked(&DmnTblLock));
     }
 
@@ -6079,7 +6083,7 @@ get_domain_disks(
         dmnDescp->dmnMajor = nblkdev + 1;
 
         return EOK;
-    } else if (doingRoot & M_GLOBAL_ROOT) {
+    } else if (clu_is_globroot(doingRoot)) {
         for (vdi = 0; vdi < global_rootdev_count; vdi++) {
             vddp = (vdDescT*)ms_malloc_waitok( sizeof( vdDescT ) );
             if ( !vddp ) {
