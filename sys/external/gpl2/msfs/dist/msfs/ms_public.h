@@ -135,6 +135,22 @@ int is_nfs(void);
 
 int is_cfs(void);
 
+/*
+ * Check if given mount flags are setup as Failover
+ * This is CFS routine and currently is not supported
+ */
+int clu_is_failover(int mnt_flags);
+
+int clu_is_failover(int flags)
+{
+#ifndef ADVFS_CFS
+    return 0;
+#else
+#error "CLUSTER FILE SYSTEM NOT SUPPORTED!"
+    /* return flag & M_FAILOVER; */
+#endif
+}
+
 int clu_is_ready(void)
 {
 #ifndef ADVFS_CFS
