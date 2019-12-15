@@ -2295,7 +2295,6 @@ retry_clu_clone_access:
     }
 
     if (bfaccState == ACC_VALID) {
-
         /*
          * If we are trying to open a clone file in a mounted
          * filesystem (we want a vnode) and the clone file was
@@ -2423,7 +2422,6 @@ retry_clu_clone_access:
         /*
          * The bfAccess struct is invalid.  Initialize it.
          */
-
         /*
          * If we're in a cluster and we're trying to access a clone
          * file and we don't yet have a vnode, we need to get a 
@@ -2596,9 +2594,12 @@ retry_clu_clone_access:
                                           &delFlag
                                           );
                 }
+
                 if (sts == EOK) {
                     DDLACTIVE_UNLOCK(&(ddlVd->ddlActiveLk));
-                } else goto err_vrele;  /* typically "not found" */
+                } else {
+                    goto err_vrele;  /* typically "not found" */
+                }
                 vdIndex = ddlVd->vdIndex;
             }
 
@@ -4306,9 +4307,7 @@ _close_it:
         /* To make certain that access structs do not lie around on the closed
          * list.  Clear dkResult if we are not CFS, NFS or type VREG
          */
-        if ((vp != NULL) && ((NFS_SERVER_TSD == 0 &&
-           ((clu_is_ready() && CFS_IN_DAEMON()) == 0)) ||
-            vp->v_type != VREG))
+        if ( (vp != NULL) && ( vp->v_type != VREG || (!is_nfs() && !is_cfs())) )
         {
             bfap->dkResult = EOK;
         }

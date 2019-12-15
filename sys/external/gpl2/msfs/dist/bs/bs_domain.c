@@ -572,6 +572,7 @@ start:
 
             domainId = dmnAttrp->bfDomainId;
 
+#ifdef ADVFS_CFS
             /*
              * If the domain is already mounted by CFS in the cluster
              * and this is not a dual mount, fail the activation.
@@ -584,6 +585,7 @@ start:
                     }
                 }
             }
+#endif
 
             if ((n_dmnP = domain_lookup( domainId, flag )) == 0) {
 
@@ -909,9 +911,11 @@ start:
 
 vd_add_error:
     (void)setmount( vnp, SM_CLEARMOUNT );
+#ifdef ADVFS_CFS
     if (clu_is_ready() && !(isMount)) {
         CC_DEV_DLM_UNLOCK(vnp->v_rdev);
     }
+#endif
     VOP_CLOSE( vnp, FREAD | FWRITE | OTYP_MNT, ndp->ni_cred, error );
     /* Nothing done with the error return above now */
     vrele( vnp );
@@ -925,6 +929,7 @@ get_attrs_error:
         
         for (vdi = 1; (vdi <= BS_MAX_VDI) && (dmnP->vdCnt > 0); vdi++)
             if ((vdp = vd_htop_if_valid(vdi, dmnP, FALSE, FALSE))) {
+#ifdef ADVFS_CFS
                 /*
                  * reclaim any old reserved file CFS vnodes that are
                  * hanging around on vnode free list for any of the
@@ -947,6 +952,7 @@ get_attrs_error:
                 if (clu_is_ready() && !(isMount)) {
                         CC_DEV_DLM_UNLOCK(vdp->devVp->v_rdev);
                 }
+#endif
                 vd_remove(dmnP, vdp, 0);
             }
     }
@@ -1131,6 +1137,7 @@ start:
 
             domainId = dmnAttrp->bfDomainId;
 
+#ifdef ADVFS_CFS
             /*
              * If the domain is already mounted by CFS in the cluster
              * fail the activation.
@@ -1141,7 +1148,7 @@ start:
                     goto vd_add_error;
                 }
             }
-
+#endif
             if ((n_dmnP = domain_lookup( domainId, flag )) == 0) {
 
                 /*
@@ -1797,6 +1804,7 @@ bs_bfdmn_deactivate(
      */
     for (vdi = 1; (vdi <= BS_MAX_VDI) && (dmnP->vdCnt > 0); vdi++)
         if ((vdp = vd_htop_if_valid(vdi, dmnP, FALSE, FALSE))) {
+#ifdef ADVFS_CFS
             /*
              * In the cluster, for non-mount paths we release the dlm device locks.
              */
@@ -1805,6 +1813,7 @@ bs_bfdmn_deactivate(
                 if (sts != EOK)
                     ADVFS_SAD2("bs_bfdmn_deactivate: could not unlock device %lx failure code %d \n",vdp->devVp->v_rdev, sts);
             }
+#endif
             vd_remove(dmnP, vdp, VD_STATE_CHANGE);
         }
 
@@ -2685,7 +2694,7 @@ get_raw_vd_attrs(
      * we need to inform spec_open()/spec_close() that we are doing a
      * mount/unmount.
      */
-
+#ifdef ADVFS_CFS
     /*
      * In the cluster, for paths other than addvol, rmvol, and mount
      * we acquire an exclusive DLM lock to serialize with other uses of
@@ -2698,6 +2707,7 @@ get_raw_vd_attrs(
            goto err_nodlmlock;
        }
     }
+#endif
 
     VOP_OPEN( &vp, FREAD | FWRITE | OTYP_MNT, ndp->ni_cred, error );
     if( error ) {
@@ -2829,9 +2839,11 @@ err_vclose:
     VOP_CLOSE(vp, FREAD | FWRITE | OTYP_MNT, ndp->ni_cred, error);
 
 err_vrele:
+#ifdef ADVFS_CFS
     if (clu_is_ready() && !(isMount)) {
         CC_DEV_DLM_UNLOCK(vp->v_rdev);
     }
+#endif
 
 err_nodlmlock:
     vrele(vp);
@@ -5137,7 +5149,7 @@ bs_fix_root_dmn(
 
                 if (vdp->devVp->v_rdev == dmnTAttr->dev) {
                     KASSERT( (vdi) != BS_BFTAG_VDI(dmnP->ftxLogTag));
-
+#ifdef ADVFS_CFS
                     /*
                      * Inform CFS of the upcoming on-disk change.
                      */
@@ -5151,6 +5163,7 @@ bs_fix_root_dmn(
                             return (int)error;
                         }
                     }
+#endif
 
                     /*
                      * Update on-disk count.
@@ -5204,13 +5217,14 @@ done:
         (void)bs_unpinpg (pgPin, logNilRecord, BS_DIRTY);
     }
 
+#ifdef ADVFS_CFS
     if (clu_is_ready() && (opIndex == ADVFS_REM_VOLUME)) {
         (void)CC_DOMAIN_CHANGE_VOL_DONE_DEV(&opIndex,
                                              dmnName,
                                              dev,
                                              sts);
     }
-
+#endif
     return sts;
 }
 

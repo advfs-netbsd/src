@@ -3162,7 +3162,7 @@ call_namei:
                      * because we had to vrele it before the call to namei, so
                      * if it changed, reset it.
                      */
-
+#ifdef ADVFS_CFS
                     if (clu_is_ready()) {
                         int error = 0;
                         save_dvp = tndp->ni_dvp;
@@ -3179,7 +3179,7 @@ call_namei:
                             goto err_rele_vnodes;
                         }
                     }
-
+#endif
                     if (to_dir_vp != tndp->ni_dvp) {
                         to_dir_vp = tndp->ni_dvp;
                     }

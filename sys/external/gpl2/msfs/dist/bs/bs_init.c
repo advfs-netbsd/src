@@ -146,7 +146,7 @@ bs_dmn_init(
     }
     bs_kernel_init(0);
     TIME_READ(ltime);
-
+#ifdef ADVFS_CFS
     /*
      * For cluster, the domainID is unique in the cluster.  The lower
      * 8 bits of the member ID are combined in the time stamp to form the
@@ -162,6 +162,7 @@ bs_dmn_init(
             TIME_READ(ltime);
         }
     }
+#endif
 
     if (SC_EQL( vdSvc, nilServiceClass )) {
         /* TEMP - need real "default service class" from storage mgt? */

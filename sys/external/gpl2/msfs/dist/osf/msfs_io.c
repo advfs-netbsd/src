@@ -195,6 +195,7 @@ _domain_panic(domainT *dmnP, char *msg, int flags)
 
     /* for cfs, we have to check global root and local root */
     if (clu_is_ready()) {
+#ifdef ADVFS_CFS
         struct mount *pmp;
         extern struct mount *bootfs;
         int err = 0;
@@ -243,6 +244,7 @@ _domain_panic(domainT *dmnP, char *msg, int flags)
                 dmnP->dmn_panic |= flags;
                 ADVFS_SAD("domain panic promoted because the domain is a boot partition:  %s", msg);
         }
+#endif
     } else {
         if ((rootfs->m_stat.f_type == MOUNT_MSFS) && 
             (dmnP == GETDOMAINP(rootfs))) {
@@ -263,9 +265,11 @@ _domain_panic(domainT *dmnP, char *msg, int flags)
 
     dmnP->dmn_panic |= flags;
 
+#ifdef ADVFS_CFS
     if (clu_is_ready()) {
         CC_CFS_DOMAIN_PANIC(dmnP->domainName, dmnP->dmn_panic);
     }
+#endif
 
     if (!(dmnP->dmn_panic & DMN_PANIC_UNMOUNT)) {
 

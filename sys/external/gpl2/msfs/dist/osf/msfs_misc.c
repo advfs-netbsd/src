@@ -118,6 +118,7 @@ osf_fd_to_bfap(
      */
     vp = (struct vnode *)tfp->f_data;
 
+#ifdef ADVFS_CFS
     if (clu_is_ready()) {
         struct vnode *cvp = vp;
         error = CC_GETPFSVP(cvp, &vp);
@@ -126,6 +127,8 @@ osf_fd_to_bfap(
             goto _error;
         }
     }
+#endif
+
     /*
      ** Make sure this is a MegaSafe file.
      */

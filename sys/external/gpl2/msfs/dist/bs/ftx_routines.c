@@ -736,13 +736,13 @@ ftx_done_fs(
      * The following test is suggested by Chet Juszczak as a reliable
      * indicator of whether the caller is the NFS server code.  
      */
-
+#if defined(ADVFS_NFS) || defined(ADVFS_CFS)
     if (NFS_SERVER_TSD != 0 ||
         (clu_is_ready() && !server_only &&
          (agentId == FTA_FS_CREATE_1 || CFS_IN_DAEMON()))) {
         ftx_special_done_mode( ftxH, FTXDONE_LOGSYNC );
     }
-
+#endif
     ftx_done_urdr( ftxH, agentId, 0,0,0,0,0,0 );
 }
 

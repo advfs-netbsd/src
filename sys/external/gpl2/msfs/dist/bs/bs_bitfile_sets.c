@@ -6420,6 +6420,7 @@ try_again:
     /* No need to do special locking for metadata files */
     if ( cloneap->dataSafety != BFD_FTX_AGENT  &&
          cloneap->dataSafety != BFD_FTX_AGENT_TEMPORARY) {
+#ifdef ADVFS_CFS
         /* If in a cluster, then provide mutual exclusion with cluster
          * directio reads on the clone.  These reads may have caused
          * extent maps for this file to be cached on other cluster
@@ -6453,6 +6454,7 @@ try_again:
                 }
             }
         }
+#endif
 
         /* The file lock must be taken after the cluster token.  This lock
          * prevents the file open mode from changing from cached mode to

@@ -938,6 +938,7 @@ msfs_real_syscall(
         }
     }
 
+#ifdef ADVFS_CFS
     if (clu_is_ready()){
         /* 
          * Insure CFS_SENT_INFO allocated for this thread to eliminate
@@ -947,6 +948,7 @@ msfs_real_syscall(
          */
         CC_CFS_CHECK_CSI();
     }
+#endif
 
 RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
     switch (opIndex) {
@@ -981,12 +983,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION(error);
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_PATH,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_get_name2(libBufp);
@@ -1022,12 +1026,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION(error);
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_PATH,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_undel_get(libBufp);
@@ -1071,12 +1077,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION(error);
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_PATH,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_undel_attach(libBufp);
@@ -1108,17 +1116,18 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION(error);
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_PATH,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_undel_detach(libBufp, 0);
             ms_free(libBufp->undelDetach.dirName);
-
 
             /* no copyout */
             /* reuse OK */
@@ -1161,12 +1170,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->getBfParams.fd,&fp);
@@ -1189,12 +1200,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->setBfAttributes.fd,&fp);
@@ -1213,12 +1226,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->getBfIAttributes.fd,&fp);
@@ -1241,12 +1256,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->setBfIAttributes.fd,&fp);
@@ -1265,12 +1282,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->moveBfMetadata.fd,&fp);
@@ -1290,12 +1309,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_ID,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_get_vol_params(libBufp, opIndex);
@@ -1318,12 +1339,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
             libBfDesc = libBufp->getVolBfDescs.bfDesc;
             libBufp->getVolBfDescs.bfDesc = NULL;
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_ID,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_get_vol_bf_descs(libBufp);
@@ -1369,12 +1392,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_ID,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_set_vol_ioq_params(libBufp);
@@ -1398,13 +1423,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
             libXtntsArray = libBufp->getBfXtntMap.xtntsArray;
             libBufp->getBfXtntMap.xtntsArray = NULL;
 
-
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->getBfXtntMap.fd,&fp);
@@ -1459,13 +1485,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
             libXtntsArray = libBufp->getCludioXtntMap.xtntsArray;
             libBufp->getCludioXtntMap.xtntsArray = NULL;
 
-
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->getCludioXtntMap.fd,&fp);
@@ -1519,8 +1546,8 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
             libXtntsArray = libBufp->getBkupXtntMap.xtntsArray;
             libBufp->getBkupXtntMap.xtntsArray = NULL;
 
+#ifdef ADVFS_CFS
             /** Operation **/
-
             /*
              * if we are in a cluster and the operation is executed
              * remotely, the rpc will malloc the memory
@@ -1530,6 +1557,7 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->getBkupXtntMap.fd,&fp);
@@ -1609,13 +1637,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
             if (parmBufLen > sizeof(libBufp->getDmnParams)) {
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
-
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_ID,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_get_dmn_params(libBufp);
@@ -1647,12 +1676,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                     );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_get_dmnname_params(libBufp);
@@ -1675,12 +1706,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_ID,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_get_bfset_params(libBufp);
@@ -1695,12 +1728,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_ID,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_set_bfset_params(libBufp);
@@ -1715,12 +1750,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 sts = msfs_syscall_op_set_bfset_params_activate(libBufp);
@@ -1750,12 +1787,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                                                  NULL );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_fset_get_info(libBufp);
@@ -1793,12 +1832,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                                                  NULL );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_fset_create(libBufp, 0, 0);
@@ -1839,12 +1880,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                                                  NULL );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_fset_get_id(libBufp);
@@ -1883,12 +1926,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                                                  NULL );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_fset_get_stats(libBufp);
@@ -1927,12 +1972,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                                                  NULL );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_fset_delete(libBufp, 0);
@@ -1973,12 +2020,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                                                &libBufp->setClone.cloneSetName);
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_fset_clone(libBufp, 0);
@@ -2020,12 +2069,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                                                 &libBufp->setRename.newSetName);
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_fset_rename(libBufp, 0);
@@ -2112,13 +2163,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
             libVolIndexArray = libBufp->getDmnVolList.volIndexArray;
             libBufp->getDmnVolList.volIndexArray = NULL;
 
-
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_ID,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts){
                 sts = msfs_syscall_op_get_dmn_vol_list(libBufp);
@@ -2166,12 +2218,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->migrate.fd,&fp);
@@ -2213,12 +2267,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
 
             libBufp->removeName.name[size] = '\0';
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->removeName.dirFd,&fp);
@@ -2250,12 +2306,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->removeBf.dirFd,&fp);
@@ -2275,12 +2333,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_ID,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_tag_stat(libBufp);
@@ -2326,9 +2386,8 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
             }
             libBufp->addVol.volName[size] = '\0';
 
-
+#ifdef ADVFS_CFS
             /** Operation **/
-
             /* Remote addvol is not supported; this call is to ensure that */
             /* the domain is local, not to function-ship the operation */
             if (clu_is_ready())
@@ -2336,6 +2395,7 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_add_volume(libBufp, opIndex);
@@ -2368,8 +2428,8 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
-
             /* Remote rmvol is not supported; this call is to ensure that */
             /* the domain is local, not to function-ship the operation */
             if (clu_is_ready())
@@ -2377,6 +2437,7 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_rem_volume(libBufp, opIndex);
@@ -2444,13 +2505,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                     );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
-
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_ss_dmn_ops(libBufp);
@@ -2491,13 +2553,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                     );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
-
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_ss_set_params(libBufp);
@@ -2538,11 +2601,13 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                     );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_ss_get_params(libBufp);
@@ -2584,12 +2649,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                     );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_ss_get_fraglist(libBufp);
@@ -2639,12 +2706,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
             libHotArray = libBufp->ssGetHotlist.ssHotArray;
             libBufp->ssGetHotlist.ssHotArray = NULL;
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_ID,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_ss_get_hotlist(libBufp);
@@ -2706,12 +2775,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
                                         NULL );
             if (error != 0) {RAISE_EXCEPTION( error )};
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_add_rem_vol_svc_class(libBufp);
@@ -2765,12 +2836,14 @@ RETRY:  /* CFS may retry ADD_VOL and REMOVE_VOL */
             }
             libBufp->addRemVolDone.volName[size] = '\0';
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_add_rem_vol_done(libBufp);
@@ -2798,12 +2871,14 @@ add_rem_vol_done_exit:
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->setBfNextAllocVol.fd,&fp);
@@ -2840,12 +2915,14 @@ add_rem_vol_done_exit:
                                                 NULL );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_switch_log(libBufp, 0);
@@ -2889,12 +2966,14 @@ add_rem_vol_done_exit:
                     );
             if (error != 0) {RAISE_EXCEPTION( error );}
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_NAME,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_switch_root_tagdir(libBufp);
@@ -2922,12 +3001,14 @@ add_rem_vol_done_exit:
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, FILE_DESC,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts) {
                 bfap = osf_fd_to_bfap(libBufp->rewriteXtntMap.fd, &fp);
@@ -2950,12 +3031,14 @@ add_rem_vol_done_exit:
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_ID,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
+#endif
 
             if (do_local && !sts)
                 sts = msfs_syscall_op_reset_free_space_cache(libBufp);
@@ -2983,13 +3066,14 @@ add_rem_vol_done_exit:
                 RAISE_EXCEPTION( EBAD_PARAMS );
             }
 
+#ifdef ADVFS_CFS
             /** Operation **/
             if (clu_is_ready())
                 sts = find_cfs_server (opIndex, libBufp, DMN_ID,
                                        &do_local, &have_domain_lock,
                                        &dlm_locked, &cfs_domain_lock,
                                        &cms_cmsdb_lock);
-
+#endif
             if (do_local && !sts)
                 sts = msfs_syscall_op_get_smsync_stats(libBufp);
 
@@ -3017,6 +3101,7 @@ add_rem_vol_done_exit:
          * crashes.  Check error code here.  Release any
          * DLM locks if retrying.
          */
+#ifdef ADVFS_CFS
         if (clu_is_ready() && (opIndex == ADVFS_ADD_VOLUME || opIndex == ADVFS_REM_VOLUME)
                 && sts == EAGAIN)
         {
@@ -3036,6 +3121,7 @@ add_rem_vol_done_exit:
             (void)mpsleep(libBufp, PZERO, (char *)NULL, 0, (void *) NULL, 0);
             goto RETRY;
         }
+#endif
         RAISE_EXCEPTION( sts );
     }
 
@@ -3046,6 +3132,7 @@ add_rem_vol_done_exit:
 
 HANDLE_EXCEPTION:
 
+#ifdef ADVFS_CFS
     if (clu_is_ready()) {
         if (have_domain_lock) {
             CC_DMN_NAME_DLM_UNLOCK(&cfs_domain_lock);
@@ -3055,6 +3142,7 @@ HANDLE_EXCEPTION:
                 CC_CMSDB_DLM_UNLOCK(&cms_cmsdb_lock);
         }
     }
+#endif
 
     if (bfap != NULL) {
         FP_UNREF_MT (fp, &u.u_file_state);
@@ -3900,6 +3988,7 @@ msfs_syscall_op_get_dmnname_params(libParamsT *libBufp)
     ** domain ID matches the domain ID specified in dmnParams, then
     ** we will not execute ESS domain_panic event.
     */
+#ifdef ADVFS_CFS
     if (clu_is_ready()) {
         struct mount *pmp = NULL;
         extern struct mount *bootfs;
@@ -3922,6 +4011,7 @@ msfs_syscall_op_get_dmnname_params(libParamsT *libBufp)
             }
         }
     }
+#endif
 
     if (rootfs->m_stat.f_type == MOUNT_MSFS) {
         rootdmnID = ((struct fileSetNode *)rootfs->m_info)->bfSetId.domainId;
@@ -3995,11 +4085,11 @@ msfs_syscall_op_set_bfset_params(libParamsT *libBufp)
         return(sts);  /* Exception */
     }
 
+#ifdef ADVFS_CFS
     /*
      * inform the cfs server that disk quota of the
      * fileset is going to be decreased.
      */
-
     if (clu_is_ready()) {
 
         BFSETTBL_LOCK_READ( bfSetp->dmnP );
@@ -4028,9 +4118,11 @@ msfs_syscall_op_set_bfset_params(libParamsT *libBufp)
         if (!clear_flag)
             BFSETTBL_UNLOCK( bfSetp->dmnP );
     }
+#endif
 
     sts = bs_set_bfset_params(bfSetp, mlBfSetParamsp, 0);
 
+#ifdef ADVFS_CFS
     /*
      * Inform the cfs server that quota change is done.
      */
@@ -4038,6 +4130,7 @@ msfs_syscall_op_set_bfset_params(libParamsT *libBufp)
         CC_FSFLUSH(pmp, C_DONE);
         UNMOUNT_READ_UNLOCK(pmp);
     }
+#endif
 
     close_set(libBufp->setBfSetParams.bfSetId, bfSetp, dmnP);
 
@@ -4072,11 +4165,11 @@ msfs_syscall_op_set_bfset_params_activate(libParamsT *libBufp)
         goto _out;
     }
 
+#ifdef ADVFS_CFS
     /*
      * inform the cfs server that disk quota of the
      * fileset is going to be decreased.
      */
-
     if (clu_is_ready()) {
 
         BFSETTBL_LOCK_READ( bfSetp->dmnP );
@@ -4105,9 +4198,11 @@ msfs_syscall_op_set_bfset_params_activate(libParamsT *libBufp)
         if (!clear_flag)
             BFSETTBL_UNLOCK( bfSetp->dmnP );
     }
+#endif
 
     sts = bs_set_bfset_params(bfSetp, mlBfSetParamsp, 0);
 
+#ifdef ADVFS_CFS
     /*
      * Inform the cfs server that quota change is done.
      */
@@ -4115,6 +4210,7 @@ msfs_syscall_op_set_bfset_params_activate(libParamsT *libBufp)
         CC_FSFLUSH(pmp, C_DONE);
         UNMOUNT_READ_UNLOCK(pmp);
     }
+#endif
 
     bs_bfs_close(bfSetp, FtxNilFtxH, BFS_OP_DEF);
 
@@ -4207,12 +4303,12 @@ msfs_syscall_op_fset_clone(libParamsT *libBufp, long xid)
     int size;
     mlStatusT sts;
 
+#ifdef ADVFS_CFS
     /*
      * inform the cfs server that clonefset is happening.
      * the server should ask all its clients to flush
      * data back to keep PFS up to date.
      */
-
     if (clu_is_ready()) {
         struct mount *pmp;
         bfSetIdT origBfSetId;
@@ -4242,6 +4338,7 @@ msfs_syscall_op_fset_clone(libParamsT *libBufp, long xid)
         bs_bfdmn_deactivate( origBfSetId.domainId, 0 );
 
     }
+#endif
 
     sts = fs_fset_clone(libBufp->setClone.domain,
                         libBufp->setClone.origSetName,
@@ -4564,6 +4661,7 @@ msfs_syscall_op_add_volume(libParamsT *libBufp, opIndexT opIndex)
     mlStatusT sts;
     int flag = 0;
 
+#ifdef ADVFS_CFS
     if (clu_is_ready()) {
         /* set flag if domain is known to cluster */
         if ( CC_DMN_NAME_TO_MP(libBufp->addVol.domain) )
@@ -4576,6 +4674,7 @@ msfs_syscall_op_add_volume(libParamsT *libBufp, opIndexT opIndex)
             return(error);  /* Exception */
         }
     }
+#endif
 
     sts = bs_vd_add_active(libBufp->addVol.domain,
                            libBufp->addVol.volName,
@@ -4586,12 +4685,14 @@ msfs_syscall_op_add_volume(libParamsT *libBufp, opIndexT opIndex)
                            flag,
                            &libBufp->addVol.bfDomainId,
                            &libBufp->addVol.volIndex);
+#ifdef ADVFS_CFS
     if (clu_is_ready()) {
         (void)CC_DOMAIN_CHANGE_VOL_DONE(&opIndex,
                                         libBufp->addVol.domain,
                                         libBufp->addVol.volName,
                                         sts);
     }
+#endif
 
     return(sts);
 }
@@ -4638,17 +4739,20 @@ msfs_syscall_op_rem_volume(libParamsT *libBufp, opIndexT opIndex)
     vd_dec_refcnt( vdp );
     vdRefBumped = 0;
 
+#ifdef ADVFS_CFS
     if (clu_is_ready()) {
         error = CC_DOMAIN_CHANGE_VOL(&opIndex, dmnP->domainName, vdName);
         if (error != 0) {
             RAISE_EXCEPTION(error);
         }
     }
+#endif
 
     sts = bs_vd_remove_active( dmnP,
                                libBufp->remVol.volIndex,
                                libBufp->remVol.forceFlag);
 
+#ifdef ADVFS_CFS
     if (clu_is_ready()) {
 
         bfSetIdT bfSetId;
@@ -4680,6 +4784,7 @@ msfs_syscall_op_rem_volume(libParamsT *libBufp, opIndexT opIndex)
         (void)CC_DOMAIN_CHANGE_VOL_DONE(&opIndex,
             dmnP->domainName, vdName, sts);
     }
+#endif
 
 HANDLE_EXCEPTION:
 
@@ -5110,6 +5215,7 @@ msfs_syscall_op_add_rem_vol_svc_class(libParamsT *libBufp)
     mlStatusT sts;
     int flag = 0;
 
+#ifdef ADVFS_CFS
     /* set flag if domain is known to cluster */
     if (clu_is_ready() && CC_DMN_NAME_TO_MP(libBufp->addRemVolSvcClass.domainName))
         flag = M_MSFS_MOUNT;
@@ -5117,6 +5223,7 @@ msfs_syscall_op_add_rem_vol_svc_class(libParamsT *libBufp)
     /* CFS TODO: check if cfs_domain_change_vol() needs to be
      * called here.
      */
+#endif
     sts = bs_bfdmn_tbl_activate( libBufp->addRemVolSvcClass.domainName,
                                  flag,
                                  &domainId );
@@ -5137,7 +5244,7 @@ msfs_syscall_op_add_rem_vol_svc_class(libParamsT *libBufp)
      * rmvol is done. if later rmvol failed, the disk
      * is adding back, we resume block reservation.
      */
-
+#ifdef ADVFS_CFS
     /*
      * Note: The CFS flush needs to occur *before* the volume
      * is removed from the service class, so that writes guaranteed
@@ -5184,6 +5291,7 @@ msfs_syscall_op_add_rem_vol_svc_class(libParamsT *libBufp)
             }
         }
     }
+#endif
 
     /* Check the disk; if valid, bump its vdRefCnt */
     {

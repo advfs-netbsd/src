@@ -734,7 +734,7 @@ freexid:
      * Call cfs_xid_free_memory() after 15 minutes.
      * It should no longer be needed after that point.
      */
-
+#ifdef ADVFS_CFS
     if (clu_is_ready()) 
     {
         ulong domainId_cast;
@@ -756,6 +756,7 @@ freexid:
             XID_TIMEOUT*hz);
         XID_RECOVERY_UNLOCK(dmnP);
     }
+#endif
     return sts;
 }
 

@@ -505,15 +505,16 @@ msfs_mount( struct mount *mp,           /* in */
          * root, actually it can be global root or local root, should check for
          * both.
          */
-
+#ifdef ADVFS_CFS
         if (clu_is_ready()) {
             extern struct mount *bootfs;
             (void)CC_GETPFSMP(rootfs, &pmp);
             if (mp != pmp)
                 (void)CC_GETPFSMP(bootfs, &pmp);
-        } else {
+        } else
+#endif
             pmp = rootfs;
-        }
+
 
         if (mp == pmp) {
 	    /* ms_malloc never fails, it doesn't return until success*/
@@ -2701,11 +2702,13 @@ msfs_sync_todr(
     int sts = EOK;
     struct mount *pmp;
 
+#ifdef ADVFS_CFS
     if (clu_is_ready()) {
         (void)CC_GETPFSMP(rootfs, &pmp);
         if (mp != pmp)
             (void)CC_GETPFSMP(bootfs, &pmp);
     } else
+#endif
         pmp = rootfs;
 
     if ((pmp == mp) || (waitfor == MNT_WAIT)) {
@@ -3200,6 +3203,7 @@ chk_unique_fsdev (
 
 loop:
     if (clu_is_ready()) {
+#ifdef ADVFS_CFS
         fsid_t fsid;
 
         fsid.val[1] = MOUNT_MSFS;
@@ -3217,6 +3221,7 @@ loop:
                 reset = 1;
             }
         }
+#endif
     } else {
         for (fsp = FilesetHead; fsp != NULL; fsp = fsp->fsNext) {
             /* if setp is Nil then it is under construction (being mounted) */
