@@ -1320,7 +1320,7 @@ bs_set_bf_params(
         /* Clones are read-only */
         return E_READ_ONLY;
     }
-
+#ifdef ADVFS_CFS
     if ( bfParams->cl.dataSafety == BFD_FTX_AGENT) {
             /*
              * Notify CFS that atomic write data logging is about to be
@@ -1329,7 +1329,8 @@ bs_set_bf_params(
              */
             (void)CC_CFS_AWDL_ENABLE(vp);
     }
-        
+#endif
+
     /*
      * Serialize with msfs_mmap() using the file_lock.
      * Hold this lock while we make any updates to the metadata 

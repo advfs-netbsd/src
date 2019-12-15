@@ -689,21 +689,25 @@ fs_fset_clone(
     bs_bfs_close(origBfSetp, FtxNilFtxH, BFS_OP_DEF);
     origSetOpen = FALSE;
 
+#ifdef ADVFS_CFS
     if (origMounted) {
         /*
          * Notify CFS about the clone.
          */
         CC_CFS_CLONE_NOTIFY(origFsid, CLONE_CREATE);
     }
+#endif
     sts = bs_bfs_clone( origBfSetId,
                         cloneSetName,
                         retCloneBfSetId,
                         dmnP,
                         xid );
     if (sts != EOK) {
+#ifdef ADVFS_CFS
         if (origMounted) {
             CC_CFS_CLONE_NOTIFY(origFsid, CLONE_DELETE);
         }
+#endif
         goto HANDLE_EXCEPTION;
     }
 

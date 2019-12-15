@@ -957,6 +957,7 @@ migrate_get_clu_locks( bfAccessT *bfap,
          */
 
         if ( !is_clone ) {
+#ifdef ADVFS_CFS
             ret = CC_CFS_CONDIO_EXCL_MODE_ENTER( bfap->bfVp );
             if ( ret != 0 ) {
                 /*
@@ -965,7 +966,7 @@ migrate_get_clu_locks( bfAccessT *bfap,
                  */
                 return ENO_MORE_MEMORY;
             }
-
+#endif
             *clu_excl_flgA = 1;
         } else {
             clu_cow_mode_enter = 1;
@@ -1053,6 +1054,7 @@ migrate_get_clu_locks( bfAccessT *bfap,
         BS_GET_FSID( cloneap->bfSetp, fsid );
 
         while ( !*clu_xtntlk_flgA ) {
+#ifdef ADVFS_CFS
             if ( cloneap->bfSetp->fsnp ) {
                 /* Try to get the token. */
                 ret = CC_CFS_COW_MODE_ENTER( fsid, cloneap->tag );
@@ -1069,6 +1071,7 @@ migrate_get_clu_locks( bfAccessT *bfap,
                     CC_CFS_COW_MODE_LEAVE( fsid, cloneap->tag );
                 }
             }
+#endif
 
             /*
              * No cluster clients currently had cached extent maps for
@@ -1695,8 +1698,9 @@ HANDLE_EXCEPTION:
         /* On cluster systems, release the read token so that the 
          * file's extent maps will be re-loaded.
          */
-
+#ifdef ADVFS_CFS
         CC_CFS_CONDIO_EXCL_MODE_LEAVE(bfap->bfVp);
+#endif
         do_cluster_cleanup = 0;
     }
 
@@ -2239,8 +2243,9 @@ HANDLE_EXCEPTION:
         /* On cluster systems, release the read token so that the 
          * file's extent maps will be re-loaded.
          */
-
+#ifdef ADVFS_CFS
         CC_CFS_CONDIO_EXCL_MODE_LEAVE(bfap->bfVp);
+#endif
         do_cluster_cleanup = 0;
     }
 

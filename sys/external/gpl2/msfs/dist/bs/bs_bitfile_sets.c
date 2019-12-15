@@ -4657,11 +4657,12 @@ bs_bfs_delete(
 
             fsid_t fsid;
             BS_GET_FSID(origSetp,fsid);
+#ifdef ADVFS_CFS
 	    /*
 	     * Tell CFS that the clone has been deleted
 	     */
-
 	    CC_CFS_CLONE_NOTIFY(fsid, CLONE_DELETE);
+#endif
 	}
         BFSETTBL_LOCK_WRITE( dmnP );
         bfs_close( origSetp, ftxH );
@@ -7044,7 +7045,9 @@ cow_done:
     if (cloneTokenHeld){
         fsid_t fsid;
         BS_GET_FSID( cloneap->bfSetp, fsid );
+#ifdef ADVFS_CFS
         CC_CFS_COW_MODE_LEAVE( fsid, cloneap->tag );
+#endif
     }
 
     bs_close_one(cloneap, 0, parentFtxH );
@@ -7082,7 +7085,9 @@ error_exit:
     if (cloneTokenHeld) {
         fsid_t fsid;
         BS_GET_FSID( cloneap->bfSetp, fsid );
+#ifdef ADVFS_CFS
         CC_CFS_COW_MODE_LEAVE( fsid, cloneap->tag );
+#endif
     }
 
     /* it should not be locked by bs_cow_pg if we get here */
@@ -7902,6 +7907,7 @@ get_clu_clone_locks( bfAccessT *bfap, struct fsContext *cp,
         /* hold_cloneset prevents a race here. The clone fileset cannot */
         /* be transitioning to mounted at this time. It is either mounted */
         /* or not and will remain so until release_clu_clone_locks is called. */
+#ifdef ADVFS_CFS
         if ( clonesetp->fsnp ) {
             /* Getting the token retrieves the extent map that was */
             /* checked-out to the client. Once no client has the extent map */
@@ -7914,6 +7920,7 @@ get_clu_clone_locks( bfAccessT *bfap, struct fsContext *cp,
                 cloneap->cloneXtntsRetrieved = 0;
             }
         }
+#endif
 
         if ( cp != NULL ) {
             FS_FILE_WRITE_LOCK( cp );
@@ -7973,7 +7980,9 @@ release_clu_clone_locks( bfAccessT *bfap,
         CLU_CLXTNT_UNLOCK( &cloneap->clu_clonextnt_lk );
         if ( token_flg ) {
             BS_GET_FSID( cloneSetp, fsid );
+#ifdef ADVFS_CFS
             CC_CFS_COW_MODE_LEAVE( fsid, cloneap->tag );
+#endif
         }
 
         bs_close_one( cloneap, 0, FtxNilFtxH );
