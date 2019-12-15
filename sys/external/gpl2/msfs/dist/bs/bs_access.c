@@ -1624,11 +1624,11 @@ bs_reclaim_cfs_rsvd_vn(
                        * the case of a cluster file system -CFS i.e.hanging
                        * onto the access struct by way of its vnode cache.
                        */
-
+#ifdef ADVFS_CFS
                        if(vp->v_tag == VT_CFS) {
                            vrecycle(vp);
                        }
-
+#endif
                        VN_UNLOCK(vp);
                        vrele(vp);
 
