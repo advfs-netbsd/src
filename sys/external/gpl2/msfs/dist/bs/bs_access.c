@@ -2582,7 +2582,7 @@ retry_clu_clone_access:
             /* During CFS failover, check the DDL for unlinked files */
 
             if (sts == ENO_SUCH_TAG) {
-                if ( clu_is_ready() && mp && (mp->m_flag & M_FAILOVER) ||
+                if ( clu_is_ready() && mp && clu_is_failover(mp->m_flag) ||
                      options & BF_OP_FIND_ON_DDL )
                 {
                     sts = find_del_entry (
@@ -2643,7 +2643,7 @@ retry_clu_clone_access:
             bfap->bfState     = BSRA_INVALID;
 
             flags = BS_MAP_DEF;
-            if (mp && (mp->m_flag & M_FAILOVER)) flags |= BS_FAILOVER;
+            if (mp && clu_is_failover(mp->m_flag)) flags |= BS_FAILOVER;
             if (options & BF_OP_FIND_ON_DDL) flags |= BS_ON_DDL;
             if ((sts = bs_map_bf(bfap, flags, mp)) != EOK) {
                 goto err_vrele;
@@ -3028,7 +3028,7 @@ retry_clu_clone_access:
          * to the state in the access structure will reset the
          * state within the access structure to ACC_VALID.
          */
-        if ((clu_is_ready()) && (mp->m_flag & M_FAILOVER) && 
+        if ((clu_is_ready()) && clu_is_failover(mp->m_flag) &&
             (bfap->bfState == BSRA_DELETING)) {
             bfaccState = ACC_VALID;
         }

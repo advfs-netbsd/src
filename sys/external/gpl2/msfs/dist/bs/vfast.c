@@ -1521,7 +1521,7 @@ ss_dmn_activate(domainT *dmnP,u_long flag)
     return;
 
 HANDLE_EXCEPTION:
-    if ( ( flag & M_FAILOVER ) && ( flag & M_GLOBAL_ROOT ) )
+    if ( clu_is_failover((int)flag) && ( flag & M_GLOBAL_ROOT ) )
 	dmnState = M_GLOBAL_ROOT;
     else
 	dmnState = 0;		

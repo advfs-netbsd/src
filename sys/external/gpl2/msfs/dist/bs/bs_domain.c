@@ -577,7 +577,7 @@ start:
              * If the domain is already mounted by CFS in the cluster
              * and this is not a dual mount, fail the activation.
              */
-            if (clu_is_ready() && !(flag & M_FAILOVER)) {
+            if (clu_is_ready() && !clu_is_failover((int)flag)) {
                 if (CC_FIND_CLUSTER_DOMAIN_ID(&domainId)) {
                     if (!(flag & M_DUAL)) {
                         sts = E_DOMAIN_ALREADY_EXISTS;
@@ -599,7 +599,7 @@ start:
                  */
 
                 if ((flag & M_DUAL) &&
-                   !(clu_is_ready() && (flag & M_FAILOVER))) {
+                   !(clu_is_ready() && clu_is_failover((int)flag))) {
 
                     struct timeval ltime;
                     dualMountId = domainId;
@@ -624,7 +624,7 @@ start:
                  */
 
                 if ((flag & M_DUAL) &&
-                   !(clu_is_ready() && (flag & M_FAILOVER))) {
+                   !(clu_is_ready() && clu_is_failover((int)flag))) {
 
                     struct timeval ltime;
                     dualMountId = domainId;
@@ -1142,7 +1142,7 @@ start:
              * If the domain is already mounted by CFS in the cluster
              * fail the activation.
              */
-            if (clu_is_ready() && !(flag & M_FAILOVER)) {
+            if (clu_is_ready() && !clu_is_failover((int)flag)) {
                 if (CC_FIND_CLUSTER_DOMAIN_ID(&domainId)) {
                     sts = E_DOMAIN_ALREADY_EXISTS;
                     goto vd_add_error;
@@ -2085,7 +2085,7 @@ bs_bfdmn_activate(
      * Remove any junk leftover by in-progress deletes.
      */
 
-    if (!clu_is_ready() || !(flag & M_FAILOVER)) {
+    if (!clu_is_ready() || !clu_is_failover((int)flag)) {
         vdcnt = vdi = 1;
         while ((vdi <= BS_MAX_VDI) && (vdcnt <= dmnP->vdCnt )) {
             if ((vdp = vd_htop_if_valid(vdi, dmnP, FALSE, FALSE))) {

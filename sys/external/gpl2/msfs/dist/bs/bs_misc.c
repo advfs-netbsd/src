@@ -6312,7 +6312,9 @@ msfs_process_deferred_delete_list(
          * racing thread.
          */
         if ( vdp = vd_htop_if_valid(vdi, dmnP, TRUE, FALSE) ) {
+#ifdef ADVFS_CFS
             del_clean_mcell_list (vdp, M_FAILOVER);
+#endif
             vd_dec_refcnt( vdp );
             vdcnt++;
         }
@@ -6327,7 +6329,9 @@ msfs_process_deferred_delete_list(
         if (BFSET_VALID(bfSetp) && (bfSetp->fsRefCnt > 0) &&
             (bfSetp->fsnp != NULL)) {
             mp = bfSetp->fsnp->mountp;
+#ifdef ADVFS_CFS
             mp->m_flag &= ~M_FAILOVER;
+#endif
         }
         entry = entry->bfsQfwd;
     }

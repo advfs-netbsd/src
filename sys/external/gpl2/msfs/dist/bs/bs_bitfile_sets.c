@@ -4404,7 +4404,7 @@ bs_bfs_delete(
     refCnt = 0;  /* refCnt is also a BfSetTablLock-needs-unlock flag */
     BFSETTBL_UNLOCK( dmnP );
 
-    if( (flag & M_FAILOVER) && (flag & M_GLOBAL_ROOT) ) {
+    if( clu_is_failover((int)flag) && (flag & M_GLOBAL_ROOT) ) {
 		dmnState =  M_GLOBAL_ROOT;
     }
     else {
@@ -4669,7 +4669,7 @@ bs_bfs_delete(
         BFSETTBL_UNLOCK( dmnP );
     }
 
-    if( (flag & M_FAILOVER) && (flag & M_GLOBAL_ROOT) ) {
+    if( clu_is_failover((int)flag) && (flag & M_GLOBAL_ROOT) ) {
 		dmnState =  M_GLOBAL_ROOT;
     }
     else {
@@ -4730,7 +4730,7 @@ HANDLE_EXCEPTION:
         bs_bfs_close(bfSetp, ftxH, BFS_OP_DEF);
     }
 
-    if( (flag & M_FAILOVER) && (flag & M_GLOBAL_ROOT) ) {
+    if( clu_is_failover((int)flag) && (flag & M_GLOBAL_ROOT) ) {
 		dmnState =  M_GLOBAL_ROOT;
     }
     else {

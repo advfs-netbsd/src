@@ -171,16 +171,15 @@ msfs_mountroot(mp, vpp)
     extern  uint32T global_rootdev_count;
     
     struct  nstatfs      *sbp;
-            
-            bfAccessT    *root_accessp;
-            int           fs_time;
-            int       sts;
-            int           error, count;
-            int           now_time;
-            bsBfSetAttrT  fsAttr_rec;
-            int           fsId = 0, newId = 1, setNewId = 0;
-            bfSetT       *bfSetp;
-            u_long        flag = mp->m_flag & ADVFS_MOUNT_FLAGS;
+    bfAccessT    *root_accessp;
+    int           fs_time;
+    int       sts;
+    int           error, count;
+    int           now_time;
+    bsBfSetAttrT  fsAttr_rec;
+    int           fsId = 0, newId = 1, setNewId = 0;
+    bfSetT       *bfSetp;
+    int           flag = mp->m_flag & ADVFS_MOUNT_FLAGS;
 
     
     MountWriteDelay = 0;
@@ -190,7 +189,7 @@ msfs_mountroot(mp, vpp)
      * mp passed in is for the physical lfs mount point.
      * If mp->m_flag|M_RDONLY is not set, then need to do update.
      */
-    if (flag & M_FAILOVER) {
+    if (clu_is_failover(flag)) {
         if (!clu_is_ready()) {
             error = EBUSY;
             goto out;
@@ -294,7 +293,7 @@ msfs_mountroot(mp, vpp)
      * CFS failover, rootfs already setup.  Skip the time update (since
      * in the case of failover, the time is already setup cluster-wide).
      */
-    if ( !(flag & M_FAILOVER)) {
+    if ( !clu_is_failover(flag)) {
         rootfs = mp;
     
         root_accessp = GETROOTACCESS( mp );
@@ -347,7 +346,7 @@ msfs_mountroot(mp, vpp)
      *    Otherwise we return newId, below.
      */
 
-    setNewId = chk_unique_fsdev(fsId, &newId, bfSetp, flag & M_FAILOVER ? 1 : 0);
+    setNewId = chk_unique_fsdev(fsId, &newId, bfSetp, clu_is_failover(flag));
 
     bfSetp->dev =
             (!(fsAttr_rec.fsDev) || setNewId) ? newId : (dev_t)fsAttr_rec.fsDev;
@@ -1283,7 +1282,7 @@ advfs_mountfs(struct mount *mp)
          * and recovery of other non root cluster filesystem, cluster_root
          * recovery thread need not acquire DmnTblLock.
          */
-        if ( (flag & M_FAILOVER ) && ((strcmp(setp->dmnP->domainName, "cluster_root")) == 0 ) ) {
+        if ( clu_is_failover(flag) && ((strcmp(setp->dmnP->domainName, "cluster_root")) == 0 ) ) {
                 dmnState = M_GLOBAL_ROOT;
         }
         else {
@@ -1340,7 +1339,7 @@ advfs_mountfs(struct mount *mp)
          * and recovery of other non root cluster filesystem, cluster_root
          * recovery thread need not acquire DmnTblLock.
          */
-        if ( (flag & M_FAILOVER ) && ((strcmp(setp->dmnP->domainName, "cluster_root")) == 0 ) ) {
+        if ( clu_is_failover(flag) && ((strcmp(setp->dmnP->domainName, "cluster_root")) == 0 ) ) {
                 dmnState = M_GLOBAL_ROOT;
         }
         else {
@@ -1771,7 +1770,7 @@ msfs_unmount(
     int restart_quotas = FALSE, fragBfClosed = FALSE;
     int restart_vfast = FALSE, nonrdonly_mount = FALSE;
     bfsStateT bfs_state;
-    u_long cfsState = (advfs_flags & M_FAILOVER) &&
+    u_long cfsState = clu_is_failover(advfs_flags) &&
                       (advfs_flags & M_GLOBAL_ROOT) ? M_GLOBAL_ROOT : 0;
     long busy;
 
@@ -3013,7 +3012,7 @@ chk_set_fsdev (
     int newId = fsId, setNewId = 0;
     int do_update = 0;
     struct nstatfs *sbp;
-    int failover = mp->m_flag & M_FAILOVER ? 1 : 0;
+    int failover = clu_is_failover(mp->m_flag);
 
     bfSetp = GETBFSETP(mp);
 

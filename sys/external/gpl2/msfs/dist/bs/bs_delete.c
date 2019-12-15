@@ -1412,7 +1412,7 @@ del_clean_mcell_list(
          */
         delete_this_mcell = FALSE;
         bfSetId.dirTag = mcellp->bfSetTag;
-        if (clu_is_ready() && (flag & M_FAILOVER)) {
+        if (clu_is_ready() && clu_is_failover((int)flag)) {
             bfSetp = bs_bfs_lookup_desc(bfSetId);
             if (bfSetp == NULL) {
                 delete_this_mcell = TRUE;
