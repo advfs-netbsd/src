@@ -131,12 +131,34 @@ task_getrusage( struct rusage * ru);
  */
 int clu_is_ready(void);
 
+int is_nfs(void);
+
+int is_cfs(void);
+
 int clu_is_ready(void)
 {
 #ifndef ADVFS_CFS
     return 0;
 #else
 #error "CLUSTER FILE SYSTEM NOT SUPPORTED!"
+#endif
+}
+
+int is_nfs(void)
+{
+#ifdef ADVFS_NFS
+    return NFS_SERVER_TSD;
+#else
+    return 0;
+#endif
+}
+
+int is_cfs(void)
+{
+#ifdef ADVFS_CFS
+    return clu_is_ready() && CFS_IN_DAEMON();
+#else
+    return 0;
 #endif
 }
 
