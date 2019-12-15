@@ -125,6 +125,21 @@ dev_t bs_bfset_get_dev( bfSetT *bfSetp );
 void
 task_getrusage( struct rusage * ru);
 
+/*
+ * Part of clu.h - this function check setup of CFS
+ * Currently Clustering is not supported.
+ */
+int clu_is_ready(void);
+
+int clu_is_ready(void)
+{
+#ifndef ADVFS_CFS
+    return 0;
+#else
+#error "CLUSTER FILE SYSTEM NOT SUPPORTED!"
+#endif
+}
+
 /* for advfs smoothsync */
 #define SMSYNC_NQS 16   /* best at n*15+1 */
 
